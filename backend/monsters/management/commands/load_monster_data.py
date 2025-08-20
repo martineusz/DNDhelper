@@ -1,8 +1,8 @@
-# app1/management/commands/load_monster_data.py
+# monsters/management/commands/load_monster_data.py
 import os
 import pandas as pd
 from django.core.management.base import BaseCommand
-from app1.models import Monster  # Make sure this is the correct import path
+from monsters.models import Monster  # Make sure this is the correct import path
 
 class Command(BaseCommand):
     help = 'Load DnD monsters from a CSV file into the database'
