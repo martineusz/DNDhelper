@@ -15,7 +15,7 @@ export default function Monsters() {
         setMonsters(data);
         setFiltered(data);
       } catch (err) {
-        console.error("Error fetching monsters:", err);
+        console.error("Error fetching compendium:", err);
       }
     };
     fetchMonsters();
@@ -94,27 +94,25 @@ export default function Monsters() {
               <th className="border px-4 py-2 text-left">CR</th>
               <th className="border px-4 py-2 text-left">AC</th>
               <th className="border px-4 py-2 text-left">HP</th>
-              <th className="border px-4 py-2 text-left">Details</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((monster) => (
               <tr key={monster.id} className="hover:bg-gray-50">
-                <td className="border px-4 py-2">{monster.name}</td>
-                <td className="border px-4 py-2">{monster.type}</td>
-                <td className="border px-4 py-2">{monster.cr}</td>
-                <td className="border px-4 py-2">{monster.ac}</td>
-                <td className="border px-4 py-2">{monster.hp}</td>
                 <td className="border px-4 py-2">
                   <a
                     href={monster.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 underline"
+                    className="text-blue-600 hover:underline"
                   >
-                    View
+                    {monster.name}
                   </a>
                 </td>
+                <td className="border px-4 py-2">{monster.type}</td>
+                <td className="border px-4 py-2">{monster.cr}</td>
+                <td className="border px-4 py-2">{monster.ac}</td>
+                <td className="border px-4 py-2">{monster.hp}</td>
               </tr>
             ))}
           </tbody>

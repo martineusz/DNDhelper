@@ -1,17 +1,17 @@
-# monsters/management/commands/load_monster_data.py
+# compendium/management/commands/load_monster_data.py
 import os
 import pandas as pd
 from django.core.management.base import BaseCommand
-from monsters.models import Monster  # Make sure this is the correct import path
+from compendium.models import Monster  # Make sure this is the correct import path
 
 class Command(BaseCommand):
-    help = 'Load DnD monsters from a CSV file into the database'
+    help = 'Load DnD compendium from a CSV file into the database'
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--file_path',
             type=str,
-            help='Path to the local CSV file containing monsters'
+            help='Path to the local CSV file containing compendium'
         )
 
     def handle(self, *args, **options):
@@ -44,7 +44,7 @@ class Command(BaseCommand):
                 if created:
                     created_count += 1
 
-            self.stdout.write(self.style.SUCCESS(f"Inserted {created_count} new monsters into the database!"))
+            self.stdout.write(self.style.SUCCESS(f"Inserted {created_count} new compendium into the database!"))
 
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"Failed to load CSV: {e}"))

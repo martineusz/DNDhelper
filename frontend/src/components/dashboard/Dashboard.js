@@ -26,6 +26,7 @@ export default function Dashboard() {
           </div>
           <div className="bottom-button">
             <a href="/dashboard/monsters" className="menu-button">Monsters</a>
+            <a href="/dashboard/spells" className="menu-button">Spells</a>
           </div>
         </nav>
 

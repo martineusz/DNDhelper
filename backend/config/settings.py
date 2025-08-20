@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'sign_in',
-    "monsters",
+    "compendium",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
