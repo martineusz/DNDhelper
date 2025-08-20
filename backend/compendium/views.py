@@ -12,3 +12,4 @@ class MonsterViewSet(viewsets.ReadOnlyModelViewSet):
 class SpellViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Spell.objects.all()
     serializer_class = SpellSerializer
+    lookup_field = 'slug'

@@ -36,7 +36,7 @@ function App() {
           <Route path="campaigns" element={<Campaigns />} />
           <Route path="monsters" element={<Monsters />} />
           <Route path="spells" element={<Spells />} />
-          <Route path="spells/:spellName" element={<SpellPage />} />
+          <Route path="spells/:slug" element={<SpellPage />} />
           <Route index element={<Navigate to="encounters" />} />
         </Route>
 

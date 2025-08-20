@@ -101,7 +101,7 @@ export default function Spells() {
                                 <tr key={spell.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="border-b px-4 py-2">
                                         <Link
-                                            to={`/dashboard/spells/${spell.name.toLowerCase().replace(/\s+/g, "-")}`}
+                                            to={`/dashboard/spells/${spell.slug}`}
                                             className="text-blue-600 hover:underline font-medium"
                                         >
                                             {spell.name}

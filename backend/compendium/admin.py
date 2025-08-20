@@ -12,6 +12,6 @@ class MonsterAdmin(admin.ModelAdmin):
 
 @admin.register(Spell)
 class SpellAdmin(admin.ModelAdmin):
-    list_display = ("name", 'classes', "level", "school", "cast_time", "range", "duration", 'material_cost')
+    list_display = ("name", 'slug', 'classes', "level", "school", "cast_time", "range", "duration", 'material_cost')
     search_fields = ("name", "school", "classes")
     list_filter = ("level", "school", "classes")
