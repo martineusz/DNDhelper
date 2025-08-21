@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 from decouple import config
 
@@ -61,6 +61,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),   # short-lived access token
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),     # refresh lasts longer
+    "ROTATE_REFRESH_TOKENS": True,                   # issue new refresh on use
+    "BLACKLIST_AFTER_ROTATION": True,
+}
 
 CORS_ALLOW_ALL_ORIGINS = True
 

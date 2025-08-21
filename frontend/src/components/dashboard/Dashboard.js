@@ -1,6 +1,5 @@
-// Dashboard.js (refactored as layout)
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom"; // import Link
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -11,7 +10,6 @@ export default function Dashboard() {
         <div className="top-left">DnDHelper</div>
         <div className="top-right">
           <button className="top-button">User</button>
-          <button className="top-button">Settings</button>
         </div>
       </header>
 
@@ -20,12 +18,13 @@ export default function Dashboard() {
         {/* Left panel */}
         <nav className="left-panel">
           <div className="menu-buttons">
-            <a href="/dashboard/encounters" className="menu-button">Encounters</a>
-            <a href="/dashboard/quick" className="menu-button">Quick Encounter</a>
-            <a href="/dashboard/campaigns" className="menu-button">Campaigns</a>
-            <a href="/dashboard/players" className="menu-button">Players</a>
-            <a href="/dashboard/monsters" className="menu-button">Monsters</a>
-            <a href="/dashboard/spells" className="menu-button">Spells</a>
+            <Link to="/dashboard/encounter-creator" className="menu-button">New Encounter</Link>
+            <Link to="/dashboard/encounters" className="menu-button">My Encounters</Link>
+            <Link to="/dashboard/quick" className="menu-button">Quick Encounter</Link>
+            <Link to="/dashboard/campaigns" className="menu-button">Campaigns</Link>
+            <Link to="/dashboard/players" className="menu-button">Players</Link>
+            <Link to="/dashboard/monsters" className="menu-button">Monsters</Link>
+            <Link to="/dashboard/spells" className="menu-button">Spells</Link>
           </div>
         </nav>
 

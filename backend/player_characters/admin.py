@@ -10,6 +10,8 @@ class PlayerCharacterAdmin(admin.ModelAdmin):
         "user",
         "character_name",
         "player_name",
+        'character_level',
+        "character_experience",
         "character_race",
         "character_subrace",
         "character_class",

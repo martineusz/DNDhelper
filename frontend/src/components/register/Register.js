@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../../api";
+import { register, login } from "../../api";
 import RegisterForm from "./RegisterForm";
 import "./Register.css";
+import { useNavigate } from "react-router-dom";
 
-export default function Register({ setIsLoggedIn }) {
+export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,28 +14,25 @@ export default function Register({ setIsLoggedIn }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/api/register/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        const errorMessages = Object.values(data).flat().join(" ");
-        throw new Error(errorMessages);
-      }
+      // Use API helper to register user
+      await register(username, password);
 
       setSuccess("User registered successfully!");
       setError("");
 
       // Auto-login
-      const token = await login(username, password);
-      localStorage.setItem("access_token", token);
-      setIsLoggedIn(true);
+      await login(username, password);
+
+      // Redirect to dashboard
       navigate("/dashboard/encounters");
     } catch (err) {
-      setError(err.message);
+      // Show readable backend error messages
+      if (err.response?.data) {
+        const messages = Object.values(err.response.data).flat().join(" ");
+        setError(messages);
+      } else {
+        setError(err.message || "Something went wrong");
+      }
       setSuccess("");
     }
   };
