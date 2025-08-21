@@ -18,9 +18,9 @@ export default function Dashboard() {
         {/* Left panel */}
         <nav className="left-panel">
           <div className="menu-buttons">
+            <Link to="/dashboard/quick" className="menu-button">Quick Combat</Link>
             <Link to="/dashboard/encounter-creator" className="menu-button">New Encounter</Link>
             <Link to="/dashboard/encounters" className="menu-button">My Encounters</Link>
-            <Link to="/dashboard/quick" className="menu-button">Quick Encounter</Link>
             <Link to="/dashboard/campaigns" className="menu-button">Campaigns</Link>
             <Link to="/dashboard/players" className="menu-button">Players</Link>
             <Link to="/dashboard/monsters" className="menu-button">Monsters</Link>
