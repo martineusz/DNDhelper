@@ -30,11 +30,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'player_characters',
+    'encounters',
+    'sign_in',
+    "compendium",
     'rest_framework_simplejwt',
     'corsheaders',
     'rest_framework',
-    'sign_in',
-    "compendium",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

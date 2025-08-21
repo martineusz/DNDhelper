@@ -7,15 +7,16 @@ import Dashboard from "./components/dashboard/Dashboard";
 import Encounters from "./components/pages/encounters/Encounters";
 import QuickEncounter from "./components/pages/quickEncounter/QuickEncounter";
 import Campaigns from "./components/pages/campaigns/Campaigns";
+import Players from "./components/pages/players/Players";
 import Monsters from "./components/pages/compendium/monsters/Monsters";
 import Spells from "./components/pages/compendium/spells/Spells";
 import SpellPage from "./components/pages/compendium/spells/SpellPage";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("access_token"));
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     setIsLoggedIn(!!token);
   }, []);
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="encounters" element={<Encounters />} />
           <Route path="quick" element={<QuickEncounter />} />
           <Route path="campaigns" element={<Campaigns />} />
+          <Route path="players" element={<Players />} />
           <Route path="monsters" element={<Monsters />} />
           <Route path="spells" element={<Spells />} />
           <Route path="spells/:slug" element={<SpellPage />} />

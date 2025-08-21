@@ -2,7 +2,16 @@ import React, { useState } from "react";
 import "./QuickEncounter.css";
 
 export default function QuickEncounter() {
-  const [participants, setParticipants] = useState([]);
+  const [participants, setParticipants] = useState([
+    {
+      id: Date.now(),
+      initiative: "",
+      name: "",
+      currentHp: "",
+      damageTaken: "",
+      tags: "",
+    },
+  ]);
 
   // A function to handle adding a new participant
   const handleAddParticipant = () => {

@@ -23,16 +23,14 @@ export default function Dashboard() {
             <a href="/dashboard/encounters" className="menu-button">Encounters</a>
             <a href="/dashboard/quick" className="menu-button">Quick Encounter</a>
             <a href="/dashboard/campaigns" className="menu-button">Campaigns</a>
-          </div>
-          <div className="bottom-button">
+            <a href="/dashboard/players" className="menu-button">Players</a>
             <a href="/dashboard/monsters" className="menu-button">Monsters</a>
             <a href="/dashboard/spells" className="menu-button">Spells</a>
           </div>
         </nav>
 
-        {/* Center panel */}
         <main className="center-panel">
-          <Outlet /> {/* Nested route content goes here */}
+          <Outlet />
         </main>
       </div>
     </div>

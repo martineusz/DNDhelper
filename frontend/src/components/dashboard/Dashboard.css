@@ -79,3 +79,9 @@
   background-color: #fff;
   padding: 20px;
 }
+
+button,
+.menu-button,
+.top-button {
+  text-decoration: none;
+}

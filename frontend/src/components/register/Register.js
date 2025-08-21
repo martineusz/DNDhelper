@@ -31,7 +31,7 @@ export default function Register({ setIsLoggedIn }) {
 
       // Auto-login
       const token = await login(username, password);
-      localStorage.setItem("token", token);
+      localStorage.setItem("access_token", token);
       setIsLoggedIn(true);
       navigate("/dashboard/encounters");
     } catch (err) {
