@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
+import API from "../../../api";
 
 // Reusable component for a single player character card.
-function PlayerCard({ player, onCardClick }) {
+function PlayerCard({player, onCardClick}) {
     const displayValue = (val) => {
         if (val === null || val === undefined || val === "") return "-";
         return val;
@@ -47,7 +48,7 @@ function PlayerCard({ player, onCardClick }) {
 }
 
 // New component for the "add" button
-function AddPlayerCard({ onCardClick }) {
+function AddPlayerCard({onCardClick}) {
     return (
         <div
             onClick={onCardClick}
@@ -75,13 +76,13 @@ function AddPlayerCard({ onCardClick }) {
 }
 
 // Modal component to display and edit/create character information.
-function CharacterDetailModal({ player, onClose, onSave }) {
+function CharacterDetailModal({player, onClose, onSave}) {
     const [editablePlayer, setEditablePlayer] = useState(player || {});
     const [isSaving, setIsSaving] = useState(false);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditablePlayer({ ...editablePlayer, [name]: value });
+        const {name, value} = e.target;
+        setEditablePlayer({...editablePlayer, [name]: value});
     };
 
     const handleSaveClick = async () => {
@@ -258,7 +259,7 @@ function CharacterDetailModal({ player, onClose, onSave }) {
                             value={editablePlayer.info || ""}
                             onChange={handleInputChange}
                             rows="4"
-                            style={{ ...inputStyle, resize: "vertical" }}
+                            style={{...inputStyle, resize: "vertical"}}
                         />
                     </label>
                 </div>
@@ -296,21 +297,10 @@ export default function Players() {
     async function fetchPlayers() {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:8000/api/characters/", {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (response.status === 401) {
-                throw new Error("Unauthorized: token invalid or expired");
-            }
-
-            const data = await response.json();
-            setPlayers(data);
+            const response = await API.get("characters/");  // 👈 axios handles token + refresh
+            setPlayers(response.data);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.detail || err.message);
         } finally {
             setLoading(false);
         }
@@ -319,34 +309,16 @@ export default function Players() {
     const handleSave = async (updatedCharacter) => {
         try {
             const url = updatedCharacter.id
-                ? `http://localhost:8000/api/characters/${updatedCharacter.id}/`
-                : "http://localhost:8000/api/characters/";
-            const method = updatedCharacter.id ? "PATCH" : "POST";
+                ? `characters/${updatedCharacter.id}/`
+                : "characters/";
+            const method = updatedCharacter.id ? "patch" : "post";
 
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(updatedCharacter),
-            });
+            const response = await API[method](url, updatedCharacter);
 
-            if (!response.ok) {
-                // If response is not ok, parse the error from the server
-                const errorData = await response.json();
-                const errorMessage = errorData.detail || "Failed to save character details.";
-                throw new Error(errorMessage);
-            }
-
-            // Clear any previous save errors on success
             setSaveError(null);
-
-            // Re-fetch the players to ensure the UI is up-to-date
-            await fetchPlayers();
+            await fetchPlayers(); // refresh list
         } catch (err) {
-            // Set the save error message
-            setSaveError(err.message);
+            setSaveError(err.response?.data?.detail || err.message);
         }
     };
 
@@ -363,11 +335,11 @@ export default function Players() {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div style={{padding: "20px"}}>
             <h1>Player Roster</h1>
             <p>Click on a character card to view and edit their details, or add a new one.</p>
             {saveError && (
-                <p style={{ color: "red", fontWeight: "bold" }}>
+                <p style={{color: "red", fontWeight: "bold"}}>
                     Error saving: {saveError}
                 </p>
             )}
@@ -386,7 +358,7 @@ export default function Players() {
                         onCardClick={setSelectedPlayer}
                     />
                 ))}
-                <AddPlayerCard onCardClick={() => setSelectedPlayer({})} />
+                <AddPlayerCard onCardClick={() => setSelectedPlayer({})}/>
             </div>
 
             {selectedPlayer && (
