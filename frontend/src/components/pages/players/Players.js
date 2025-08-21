@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 
 // Reusable component for a single player character card.
 function PlayerCard({ player, onCardClick }) {
+    const displayValue = (val) => {
+        if (val === null || val === undefined || val === "") return "-";
+        return val;
+    };
+
     return (
         <div
             onClick={() => onCardClick(player)}
@@ -17,27 +22,26 @@ function PlayerCard({ player, onCardClick }) {
             onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
             onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-            <h3>{player.character_name}</h3>
+            <h3>{displayValue(player.character_name)}</h3>
             <p>
-                <strong>Player:</strong> {player.player_name}
+                <strong>Player:</strong> {displayValue(player.player_name)}
             </p>
             <p>
-                <strong>Level:</strong> {player.character_level ?? "N/A"}
+                <strong>Level:</strong> {displayValue(player.character_level)}
             </p>
             <p>
-                <strong>AC:</strong> {player.ac ?? "N/A"}
+                <strong>AC:</strong> {displayValue(player.ac)}
             </p>
             <p>
-                <strong>Class:</strong> {player.character_class}
+                <strong>Class:</strong> {displayValue(player.character_class)}
             </p>
             <p>
-                <strong>Race:</strong> {player.character_race}
+                <strong>Race:</strong> {displayValue(player.character_race)}
             </p>
-            {player.info && (
-                <p>
-                    <strong>Info:</strong> {player.info.substring(0, 50)}...
-                </p>
-            )}
+            <p>
+                <strong>Info:</strong>{" "}
+                {player.info ? player.info.substring(0, 50) + "..." : "-"}
+            </p>
         </div>
     );
 }

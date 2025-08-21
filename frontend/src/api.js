@@ -13,29 +13,29 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle expired access tokens
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // If we get 401 and haven’t retried yet
+    // If token expired and we haven’t retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       const refresh = localStorage.getItem("refresh_token");
       if (refresh) {
         try {
+          // Get new access token
           const res = await axios.post("http://localhost:8000/api/token/refresh/", {
             refresh,
           });
 
-          // Save new access token
-          localStorage.setItem("access_token", res.data.access);
+          const newAccess = res.data.access;
+          localStorage.setItem("access_token", newAccess);
 
-          // Retry original request with new token
-          originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
-          return API(originalRequest);
+          // Update header and retry original request
+          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+          return API(originalRequest); // 👈 retry instead of failing
         } catch (refreshError) {
           // Refresh failed → logout
           localStorage.removeItem("access_token");
@@ -45,9 +45,11 @@ API.interceptors.response.use(
       }
     }
 
+    // For other errors
     return Promise.reject(error);
   }
 );
+
 
 export default API;
 
