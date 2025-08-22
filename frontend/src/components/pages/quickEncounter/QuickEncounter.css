@@ -1,0 +1,83 @@
+.quick-encounter-container {
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.add-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.encounter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 1.5fr 50px; /* Adjusted to 4 main columns */
+  gap: 10px;
+}
+
+.grid-header {
+  display: contents;
+  font-weight: bold;
+  border-bottom: 2px solid #333;
+}
+
+.grid-column {
+  padding: 8px;
+  text-align: left;
+}
+
+.grid-row {
+  display: contents;
+}
+
+.grid-row input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.hp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.damage-input-group {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.damage-button {
+  padding: 8px;
+  cursor: pointer;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  background-color: #ff9800;
+  white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.damage-button:hover {
+  background-color: #e68a00;
+}
+
+.delete-button {
+  padding: 8px;
+  cursor: pointer;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
