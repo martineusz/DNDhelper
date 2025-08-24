@@ -16,6 +16,8 @@
   color: white;
   padding: 0 20px;
   height: 60px;
+  /* Ensure logo, menu buttons, and user button are aligned */
+  gap: 20px;
 }
 
 .top-left {
@@ -39,24 +41,16 @@
   overflow: hidden;
 }
 
-/* Left panel */
+/* Left panel is removed, styles are no longer needed */
 .left-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #f0f0f0;
-  width: 200px;
-  padding: 20px;
+  display: none;
 }
 
+/* Menu buttons for top panel */
 .menu-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Change to row for horizontal layout */
   gap: 10px;
-}
-
-.bottom-button {
-  margin-top: auto;
 }
 
 .menu-button {
@@ -66,7 +60,7 @@
   background-color: #007bff;
   color: white;
   cursor: pointer;
-  text-align: left;
+  text-align: center; /* Center the text for a cleaner look */
 }
 
 .menu-button:hover {

@@ -27,4 +27,5 @@ urlpatterns = [
     path('api/', include('sign_in.urls')),
     path('api/', include('compendium.urls')),
     path('api/', include('player_characters.urls')),
+    path('api/', include('encounters.urls')),
 ]
