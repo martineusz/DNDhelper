@@ -1,0 +1,20 @@
+/* No changes needed here, as the problem is with the height of the panels themselves. */
+.encounter-creator-container {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* No changes needed here, as this just styles the rows within the lists. */
+.player-row, .monster-row {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* THIS IS THE KEY FIX: Reduce the max-height value. */
+.scrollable-list {
+  max-height: 330px; /* Changed from 500px to 250px */
+  overflow-y: auto;
+}
