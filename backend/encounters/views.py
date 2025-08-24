@@ -1,14 +1,13 @@
+# encounters/views.py
 from rest_framework import viewsets
 
-from .models import PlayerEncounterData, MonsterEncounterData
-from .serializers import PlayerEncounterDataSerializer, MonsterEncounterDataSerializer
+from .models import Encounter
+from .serializers import EncounterSerializer
 
 
-class PlayerEncounterDataViewSet(viewsets.ModelViewSet):
-    queryset = PlayerEncounterData.objects.all()
-    serializer_class = PlayerEncounterDataSerializer
-
-
-class MonsterEncounterDataViewSet(viewsets.ModelViewSet):
-    queryset = MonsterEncounterData.objects.all()
-    serializer_class = MonsterEncounterDataSerializer
+class EncounterViewSet(viewsets.ModelViewSet):
+    queryset = Encounter.objects.prefetch_related(
+        'player_data__player_character',
+        'monster_data__monster'
+    ).all()
+    serializer_class = EncounterSerializer

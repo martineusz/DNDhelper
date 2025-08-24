@@ -1,4 +1,3 @@
-// EncounterCreator.js
 import React, { useState } from "react";
 import Select from "react-select";
 import PlayerRow from "./PlayerRow";
@@ -86,47 +85,53 @@ export default function EncounterCreator() {
   const handleSaveEncounter = async () => {
     const apiBaseUrl = "http://localhost:8000/api";
 
-    // Save Player Encounter Data
     try {
-      const playerPromises = selectedPlayers.map(player => {
-        const payload = {
-          player_character: player.id,
-          initiative: 0,
-          current_hp: player.hp,
-          notes: "",
-        };
-        return fetch(`${apiBaseUrl}/player-encounters/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
+      // 1. Prepare the nested data for players and monsters
+      const playerPayload = selectedPlayers.map(player => ({
+        player_character: player.id,
+        initiative: 0,
+        current_hp: player.hp,
+        notes: "",
+      }));
+
+      const monsterPayload = selectedMonsters.map(monster => ({
+        monster: monster.id,
+        initiative: 0,
+        current_hp: monster.hp,
+        notes: "",
+      }));
+
+      // 2. Create the main Encounter object with nested player and monster data
+      const payload = {
+        name: "My New Encounter", // You can make this dynamic with a state variable
+        description: "A new combat encounter.", // Same here
+        player_data: playerPayload,
+        monster_data: monsterPayload,
+      };
+
+      const response = await fetch(`${apiBaseUrl}/encounters/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
-      const monsterPromises = selectedMonsters.map(monster => {
-        const payload = {
-          monster: monster.id,
-          initiative: 0,
-          current_hp: monster.hp,
-          notes: "",
-        };
-        return fetch(`${apiBaseUrl}/monster-encounters/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to save encounter: ${response.status} ${response.statusText} - ${errorText}`);
+      }
 
-      await Promise.all([...playerPromises, ...monsterPromises]);
-      alert("Encounter saved successfully!");
+      const newEncounter = await response.json();
+      alert(`Encounter "${newEncounter.name}" saved successfully!`);
+      console.log("Saved Encounter:", newEncounter);
+
     } catch (error) {
       console.error("Failed to save encounter:", error);
       alert("Failed to save encounter. Check console for details.");
     }
   };
+
 
   const partyXpThresholds = calculatePartyXpThresholds(selectedPlayers);
   const totalMonsterXp = calculateMonsterXp(selectedMonsters);
