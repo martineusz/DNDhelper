@@ -1,3 +1,4 @@
+# encounters/models.py
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -27,14 +28,17 @@ class PlayerEncounterData(models.Model):
     player_character = models.ForeignKey(
         PlayerCharacter,
         on_delete=models.PROTECT,
-        related_name="encounter_data"
+        related_name="encounter_data",
+        blank=True,
+        null=True,
     )
+    name = models.CharField(max_length=255, blank=True, null=True)
     initiative = models.IntegerField(blank=True, null=True)
     current_hp = models.IntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Encounter data for {self.player_character.character_name}"
+        return f"Encounter data for {self.player_character.character_name if self.player_character else self.name}"
 
 
 class MonsterEncounterData(models.Model):
@@ -46,11 +50,16 @@ class MonsterEncounterData(models.Model):
     monster = models.ForeignKey(
         Monster,
         on_delete=models.PROTECT,
-        related_name="encounter_data"
+        related_name="encounter_data",
+        blank=True,
+        null=True,
     )
+    name = models.CharField(max_length=255, blank=True, null=True)
     initiative = models.IntegerField(blank=True, null=True)
     current_hp = models.IntegerField(blank=True, null=True)
+    # FIX: Add AC field to MonsterEncounterData
+    ac = models.IntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Encounter data for {self.monster.name}"
+        return f"Encounter data for {self.monster.name if self.monster else self.name}"

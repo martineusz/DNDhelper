@@ -19,71 +19,66 @@ export default function EncounterCreator() {
     const [customPlayerName, setCustomPlayerName] = useState("");
     const [customMonsterName, setCustomMonsterName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
-    const [isCreatingCustom, setIsCreatingCustom] = useState(false);
+    // The previous state `isCreatingCustom` is no longer needed because we're not making an API call for custom entries.
 
     const navigate = useNavigate();
 
-    const handleAddCustomPlayer = async () => {
+    const handleAddCustomPlayer = () => {
         if (!customPlayerName) return;
 
-        setIsCreatingCustom(true);
-        try {
-            // Step 1: Create the new PlayerCharacter in the database
-            const response = await API.post("/characters/", {
-                character_name: customPlayerName,
-                // Add any other required fields for a new character
-            });
-            const newPlayer = response.data;
+        // Create a temporary object with a unique ID for React's key prop
+        // The id is a negative number to distinguish it from database IDs
+        const newPlayer = {
+            id: -(new Date().getTime()),
+            name: customPlayerName,
+            // FIX: Set initiative and HP to 0 by default for new entries
+            initiative: 0,
+            current_hp: 0,
+            notes: "",
+        };
 
-            // Step 2: Add the newly created character (with a real ID) to the selected list
-            setSelectedPlayers([...selectedPlayers, newPlayer]);
-            setCustomPlayerName("");
-            // Refresh the available players list
-            refreshData();
-            alert(`New character "${newPlayer.character_name}" created and added!`);
-        } catch (error) {
-            console.error("Failed to create custom player:", error);
-            alert("Failed to create custom player.");
-        } finally {
-            setIsCreatingCustom(false);
-        }
+        // Add the temporary object directly to the selected list
+        setSelectedPlayers([...selectedPlayers, newPlayer]);
+        setCustomPlayerName("");
     };
 
-    const handleAddCustomMonster = async () => {
+    const handleAddCustomMonster = () => {
         if (!customMonsterName) return;
 
-        setIsCreatingCustom(true);
-        try {
-            // Step 1: Create the new Monster in the database
-            const response = await API.post("/monsters/", {
-                name: customMonsterName,
-                // Add any other required fields for a new monster
-                cr: "0",
-                hp: 0,
-                ac: 0,
-            });
-            const newMonster = response.data;
+        // Create a temporary object with a unique ID for React's key prop
+        // The id is a negative number to distinguish it from database IDs
+        const newMonster = {
+            id: -(new Date().getTime()),
+            name: customMonsterName,
+            // FIX: Set initiative, HP, and AC to 0 by default for new entries
+            initiative: 0,
+            current_hp: 0,
+            ac: 0,
+            notes: "",
+            // Add other monster properties if needed for summary
+            cr: "0",
+            xp: 0,
+        };
 
-            // Step 2: Add the newly created monster (with a real ID) to the selected list
-            setSelectedMonsters([...selectedMonsters, newMonster]);
-            setCustomMonsterName("");
-            // Refresh the available monsters list
-            refreshData();
-            alert(`New monster "${newMonster.name}" created and added!`);
-        } catch (error) {
-            console.error("Failed to create custom monster:", error);
-            alert("Failed to create custom monster.");
-        } finally {
-            setIsCreatingCustom(false);
-        }
+        // Add the temporary object directly to the selected list
+        setSelectedMonsters([...selectedMonsters, newMonster]);
+        setCustomMonsterName("");
     };
+
 
     const handlePlayerSelect = (selectedOption) => {
         if (selectedOption) {
             const playerToAdd = availablePlayers.find(p => p.id === selectedOption.value);
             if (playerToAdd) {
-                // Add the existing player object directly
-                setSelectedPlayers([...selectedPlayers, playerToAdd]);
+                // FIX: Create a new object with all required fields
+                const newPlayer = {
+                    ...playerToAdd,
+                    initiative: playerToAdd.initiative || 0,
+                    current_hp: playerToAdd.hp || 0,
+                    notes: playerToAdd.notes || "",
+                    // Add other properties if needed
+                };
+                setSelectedPlayers([...selectedPlayers, newPlayer]);
             }
         }
     };
@@ -92,8 +87,15 @@ export default function EncounterCreator() {
         if (selectedOption) {
             const monsterToAdd = availableMonsters.find(m => m.id === selectedOption.value);
             if (monsterToAdd) {
-                // Add the existing monster object directly
-                setSelectedMonsters([...selectedMonsters, monsterToAdd]);
+                 // FIX: Create a new object with all required fields
+                 const newMonster = {
+                     ...monsterToAdd,
+                     initiative: monsterToAdd.initiative || 0,
+                     current_hp: monsterToAdd.hp || 0,
+                     ac: monsterToAdd.ac || 0,
+                     notes: monsterToAdd.notes || "",
+                 };
+                setSelectedMonsters([...selectedMonsters, newMonster]);
             }
         }
     };
@@ -120,7 +122,6 @@ export default function EncounterCreator() {
 
     const handleSaveEncounter = async () => {
         const apiBaseUrl = "http://localhost:8000/api";
-        // FIX: Change `Token` to `Bearer` to match the backend's JWT configuration
         const authToken = localStorage.getItem('access_token');
 
         if (!authToken) {
@@ -132,19 +133,49 @@ export default function EncounterCreator() {
         setIsSaving(true);
 
         try {
-            const playerPayload = selectedPlayers.map(player => ({
-                player_character: player.id,
-                initiative: player.initiative,
-                current_hp: player.current_hp,
-                notes: player.notes,
-            }));
+            // Check each player: if it has an ID, use it. If not, use the custom name.
+            const playerPayload = selectedPlayers.map(player => {
+                if (player.id > 0) { // Existing player
+                    return {
+                        player_character: player.id,
+                        initiative: player.initiative,
+                        current_hp: player.current_hp,
+                        notes: player.notes,
+                    };
+                } else { // Custom player
+                    return {
+                        name: player.name, // Use the new 'name' field
+                        player_character: null, // Ensure the FK is null
+                        initiative: player.initiative,
+                        current_hp: player.current_hp,
+                        notes: player.notes,
+                    };
+                }
+            });
 
-            const monsterPayload = selectedMonsters.map(monster => ({
-                monster: monster.id,
-                initiative: monster.initiative,
-                current_hp: monster.current_hp,
-                notes: monster.notes,
-            }));
+            // Check each monster: if it has an ID, use it. If not, use the custom name.
+            const monsterPayload = selectedMonsters.map(monster => {
+                if (monster.id > 0) { // Existing monster
+                    return {
+                        monster: monster.id,
+                        initiative: monster.initiative,
+                        current_hp: monster.current_hp,
+                        notes: monster.notes,
+                        // FIX: Ensure AC is included for existing monsters
+                        ac: monster.ac,
+                    };
+                } else { // Custom monster
+                    return {
+                        name: monster.name, // Use the new 'name' field
+                        monster: null, // Ensure the FK is null
+                        initiative: monster.initiative,
+                        current_hp: monster.current_hp,
+                        notes: monster.notes,
+                        // FIX: Ensure AC is included for custom monsters
+                        ac: monster.ac,
+                    };
+                }
+            });
 
             const payload = {
                 name: "My Encounter",
@@ -157,7 +188,6 @@ export default function EncounterCreator() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // FIX IS HERE: Change the prefix from 'Token' to 'Bearer'
                     'Authorization': `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(payload),
@@ -234,7 +264,7 @@ export default function EncounterCreator() {
                         />
                         <button
                             onClick={handleAddCustomPlayer}
-                            disabled={isCreatingCustom}
+                            disabled={isSaving}
                             style={{
                                 padding: "8px 12px",
                                 backgroundColor: "#f0f0f0",
@@ -244,7 +274,7 @@ export default function EncounterCreator() {
                                 cursor: "pointer",
                             }}
                         >
-                            {isCreatingCustom ? "Creating..." : "Add"}
+                            {isSaving ? "Adding..." : "Add"}
                         </button>
                     </div>
                     <Select
@@ -264,6 +294,7 @@ export default function EncounterCreator() {
                         {selectedPlayers.length > 0 && (
                             <div>
                                 {selectedPlayers.map((player) => (
+                                    // You may need to update PlayerRow to handle players without character_name
                                     <PlayerRow key={player.id} player={player} onUpdate={handlePlayerUpdate}
                                                onDelete={handlePlayerDelete}/>
                                 ))}
@@ -290,7 +321,7 @@ export default function EncounterCreator() {
                         />
                         <button
                             onClick={handleAddCustomMonster}
-                            disabled={isCreatingCustom}
+                            disabled={isSaving}
                             style={{
                                 padding: "8px 12px",
                                 backgroundColor: "#f0f0f0",
@@ -300,7 +331,7 @@ export default function EncounterCreator() {
                                 cursor: "pointer",
                             }}
                         >
-                            {isCreatingCustom ? "Creating..." : "Add"}
+                            {isSaving ? "Adding..." : "Add"}
                         </button>
                     </div>
                     <Select
@@ -320,6 +351,7 @@ export default function EncounterCreator() {
                         {selectedMonsters.length > 0 && (
                             <div>
                                 {selectedMonsters.map((monster) => (
+                                    // You may need to update MonsterRow to handle monsters without the `name` field
                                     <MonsterRow key={monster.id} monster={monster} onUpdate={handleMonsterUpdate}
                                                 onDelete={handleMonsterDelete}/>
                                 ))}

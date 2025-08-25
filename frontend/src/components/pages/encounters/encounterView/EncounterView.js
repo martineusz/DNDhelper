@@ -14,6 +14,7 @@ export default function EncounterView() {
     const fetchEncounter = async () => {
       try {
         setLoading(true);
+        // Ensure you are fetching the data with a valid token
         const response = await API.get(`encounters/${id}/`);
         setEncounter(response.data);
       } catch (err) {
@@ -54,10 +55,20 @@ export default function EncounterView() {
           <ul className="detail-list">
             {encounter.player_data.map((data) => (
               <li key={data.id} className="detail-item">
-                <p><strong>Name:</strong> {data.player_character}</p>
-                <p><strong>Initiative:</strong> {data.initiative || "-"}</p>
-                <p><strong>Current HP:</strong> {data.current_hp || "-"}</p>
-                <p><strong>Notes:</strong> {data.notes || "-"}</p>
+                <p>
+                  <strong>Name:</strong>{" "}
+                  {/* FIX: Check for the nested object or fall back to the custom name */}
+                  {data.player_character?.character_name || data.name}
+                </p>
+                <p>
+                  <strong>Initiative:</strong> {data.initiative || "0"}
+                </p>
+                <p>
+                  <strong>Current HP:</strong> {data.current_hp || "0"}
+                </p>
+                <p>
+                  <strong>Notes:</strong> {data.notes || "-"}
+                </p>
               </li>
             ))}
           </ul>
@@ -67,10 +78,20 @@ export default function EncounterView() {
           <ul className="detail-list">
             {encounter.monster_data.map((data) => (
               <li key={data.id} className="detail-item">
-                <p><strong>Name:</strong> {data.monster}</p>
-                <p><strong>Initiative:</strong> {data.initiative || "-"}</p>
-                <p><strong>Current HP:</strong> {data.current_hp || "-"}</p>
-                <p><strong>Notes:</strong> {data.notes || "-"}</p>
+                <p>
+                  <strong>Name:</strong>{" "}
+                  {/* FIX: Check for the nested object or fall back to the custom name */}
+                  {data.monster?.name || data.name}
+                </p>
+                <p>
+                  <strong>Initiative:</strong> {data.initiative || "0"}
+                </p>
+                <p>
+                  <strong>Current HP:</strong> {data.current_hp || "0"}
+                </p>
+                <p>
+                  <strong>Notes:</strong> {data.notes || "-"}
+                </p>
               </li>
             ))}
           </ul>

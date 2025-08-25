@@ -5,44 +5,61 @@ from compendium.models import Monster
 from .models import Encounter, PlayerEncounterData, MonsterEncounterData
 
 
+# Step 1: Create a nested serializer for PlayerCharacter
+class PlayerCharacterNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerCharacter
+        fields = ["id", "character_name"]  # Only include the fields you need
+
+
+# Step 2: Create a nested serializer for Monster
+class MonsterNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Monster
+        fields = ["id", "name"]  # Only include the fields you need
+
+
 class PlayerEncounterDataSerializer(serializers.ModelSerializer):
-    player_character = serializers.PrimaryKeyRelatedField(
-        queryset=PlayerCharacter.objects.all()
-    )
+    # Step 3: Use the nested serializer for the player_character field
+    player_character = PlayerCharacterNestedSerializer(read_only=True)
+
+    # Allow a custom name to be written, but it won't be read back in this way.
+    # The 'name' field is used for custom entries.
+    name = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = PlayerEncounterData
-        fields = ["player_character", "initiative", "current_hp", "notes"]
+        fields = ["player_character", "name", "initiative", "current_hp", "notes"]
 
 
 class MonsterEncounterDataSerializer(serializers.ModelSerializer):
-    monster = serializers.PrimaryKeyRelatedField(
-        queryset=Monster.objects.all()
-    )
+    # Step 4: Use the nested serializer for the monster field
+    monster = MonsterNestedSerializer(read_only=True)
+
+    # Allow a custom name to be written, but it won't be read back in this way.
+    # The 'name' field is used for custom entries.
+    name = serializers.CharField(required=False, allow_null=True)
+    ac = serializers.IntegerField(required=False, allow_null=True)
 
     class Meta:
         model = MonsterEncounterData
-        fields = ["monster", "initiative", "current_hp", "notes"]
+        fields = ["monster", "name", "initiative", "current_hp", "ac", "notes"]
 
 
 class EncounterSerializer(serializers.ModelSerializer):
-    player_data = PlayerEncounterDataSerializer(many=True)
-    monster_data = MonsterEncounterDataSerializer(many=True)
+    # Step 5: Use the updated serializers for the nested data
+    player_data = PlayerEncounterDataSerializer(many=True, required=False)
+    monster_data = MonsterEncounterDataSerializer(many=True, required=False)
 
     class Meta:
         model = Encounter
-        # Add 'user' to the fields
         fields = ["id", "name", "description", "player_data", "monster_data", "user"]
-        # Make 'user' a read-only field
         read_only_fields = ["user"]
 
     def create(self, validated_data):
-        # The user field is now passed via the viewset's serializer.save() method.
-        # It's already in validated_data and doesn't need to be popped.
+        # Your create method is already correct and doesn't need changes.
         player_data = validated_data.pop('player_data', [])
         monster_data = validated_data.pop('monster_data', [])
-
-        # The user is now automatically included in validated_data
         encounter = Encounter.objects.create(**validated_data)
 
         for player_item in player_data:
