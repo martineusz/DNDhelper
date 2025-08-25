@@ -6,7 +6,6 @@ from .models import Encounter, PlayerEncounterData, MonsterEncounterData
 
 
 class PlayerEncounterDataSerializer(serializers.ModelSerializer):
-    # This serializer is used for both reading and writing (nested)
     player_character = serializers.PrimaryKeyRelatedField(
         queryset=PlayerCharacter.objects.all()
     )
@@ -17,7 +16,6 @@ class PlayerEncounterDataSerializer(serializers.ModelSerializer):
 
 
 class MonsterEncounterDataSerializer(serializers.ModelSerializer):
-    # This serializer is used for both reading and writing (nested)
     monster = serializers.PrimaryKeyRelatedField(
         queryset=Monster.objects.all()
     )
@@ -28,27 +26,28 @@ class MonsterEncounterDataSerializer(serializers.ModelSerializer):
 
 
 class EncounterSerializer(serializers.ModelSerializer):
-    # Use the writable nested serializers for input
     player_data = PlayerEncounterDataSerializer(many=True)
     monster_data = MonsterEncounterDataSerializer(many=True)
 
     class Meta:
         model = Encounter
-        fields = ["id", "name", "description", "player_data", "monster_data"]
+        # Add 'user' to the fields
+        fields = ["id", "name", "description", "player_data", "monster_data", "user"]
+        # Make 'user' a read-only field
+        read_only_fields = ["user"]
 
     def create(self, validated_data):
-        # Pop the nested data out of the validated_data
+        # The user field is now passed via the viewset's serializer.save() method.
+        # It's already in validated_data and doesn't need to be popped.
         player_data = validated_data.pop('player_data', [])
         monster_data = validated_data.pop('monster_data', [])
 
-        # Create the parent Encounter instance
+        # The user is now automatically included in validated_data
         encounter = Encounter.objects.create(**validated_data)
 
-        # Create the nested PlayerEncounterData objects
         for player_item in player_data:
             PlayerEncounterData.objects.create(encounter=encounter, **player_item)
 
-        # Create the nested MonsterEncounterData objects
         for monster_item in monster_data:
             MonsterEncounterData.objects.create(encounter=encounter, **monster_item)
 

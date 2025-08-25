@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from compendium.models import Monster
 from player_characters.models import PlayerCharacter
@@ -7,6 +8,11 @@ from player_characters.models import PlayerCharacter
 class Encounter(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="encounters"
+    )
 
     def __str__(self):
         return self.name

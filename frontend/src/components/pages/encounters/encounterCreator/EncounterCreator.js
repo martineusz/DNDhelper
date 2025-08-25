@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom"; // Import useNavigate
+import {useNavigate} from "react-router-dom";
 import Select from "react-select";
 import PlayerRow from "./PlayerRow";
 import MonsterRow from "./MonsterRow";
@@ -8,49 +8,81 @@ import {useEncounterData} from "./hooks/useEncounterData";
 import {calculateMonsterXp, calculatePartyXpThresholds} from "./utils/EncounterCalculations";
 import "./EncounterCreator.css";
 
+// This import assumes your api.js is located four directories up.
+// Adjust the path if your file structure is different.
+import API from "../../../../api";
+
 export default function EncounterCreator() {
-    const {availablePlayers, availableMonsters, loading, error} = useEncounterData();
+    const {availablePlayers, availableMonsters, loading, error, refreshData} = useEncounterData();
     const [selectedPlayers, setSelectedPlayers] = useState([]);
     const [selectedMonsters, setSelectedMonsters] = useState([]);
     const [customPlayerName, setCustomPlayerName] = useState("");
     const [customMonsterName, setCustomMonsterName] = useState("");
-    const [nextId, setNextId] = useState(0);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isCreatingCustom, setIsCreatingCustom] = useState(false);
 
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
-    const handleAddCustomPlayer = () => {
-        const newPlayer = {
-            id: `new-player-${nextId}`,
-            character_name: customPlayerName || "New Character",
-            player_name: "unnamed player",
-            character_level: 1,
-            hp: 0,
-            ac: 0,
-            url: ""
-        };
-        setSelectedPlayers([...selectedPlayers, newPlayer]);
-        setNextId(nextId + 1);
-        setCustomPlayerName("");
+    const handleAddCustomPlayer = async () => {
+        if (!customPlayerName) return;
+
+        setIsCreatingCustom(true);
+        try {
+            // Step 1: Create the new PlayerCharacter in the database
+            const response = await API.post("/characters/", {
+                character_name: customPlayerName,
+                // Add any other required fields for a new character
+            });
+            const newPlayer = response.data;
+
+            // Step 2: Add the newly created character (with a real ID) to the selected list
+            setSelectedPlayers([...selectedPlayers, newPlayer]);
+            setCustomPlayerName("");
+            // Refresh the available players list
+            refreshData();
+            alert(`New character "${newPlayer.character_name}" created and added!`);
+        } catch (error) {
+            console.error("Failed to create custom player:", error);
+            alert("Failed to create custom player.");
+        } finally {
+            setIsCreatingCustom(false);
+        }
     };
 
-    const handleAddCustomMonster = () => {
-        const newMonster = {
-            id: `new-monster-${nextId}`,
-            name: customMonsterName || "New Monster",
-            cr: "0",
-            hp: 0,
-            ac: 0,
-            url: ""
-        };
-        setSelectedMonsters([...selectedMonsters, newMonster]);
-        setNextId(nextId + 1);
-        setCustomMonsterName("");
+    const handleAddCustomMonster = async () => {
+        if (!customMonsterName) return;
+
+        setIsCreatingCustom(true);
+        try {
+            // Step 1: Create the new Monster in the database
+            const response = await API.post("/monsters/", {
+                name: customMonsterName,
+                // Add any other required fields for a new monster
+                cr: "0",
+                hp: 0,
+                ac: 0,
+            });
+            const newMonster = response.data;
+
+            // Step 2: Add the newly created monster (with a real ID) to the selected list
+            setSelectedMonsters([...selectedMonsters, newMonster]);
+            setCustomMonsterName("");
+            // Refresh the available monsters list
+            refreshData();
+            alert(`New monster "${newMonster.name}" created and added!`);
+        } catch (error) {
+            console.error("Failed to create custom monster:", error);
+            alert("Failed to create custom monster.");
+        } finally {
+            setIsCreatingCustom(false);
+        }
     };
 
     const handlePlayerSelect = (selectedOption) => {
         if (selectedOption) {
             const playerToAdd = availablePlayers.find(p => p.id === selectedOption.value);
-            if (playerToAdd && !selectedPlayers.some(p => p.id === playerToAdd.id)) {
+            if (playerToAdd) {
+                // Add the existing player object directly
                 setSelectedPlayers([...selectedPlayers, playerToAdd]);
             }
         }
@@ -59,7 +91,8 @@ export default function EncounterCreator() {
     const handleMonsterSelect = (selectedOption) => {
         if (selectedOption) {
             const monsterToAdd = availableMonsters.find(m => m.id === selectedOption.value);
-            if (monsterToAdd && !selectedMonsters.some(m => m.id === monsterToAdd.id)) {
+            if (monsterToAdd) {
+                // Add the existing monster object directly
                 setSelectedMonsters([...selectedMonsters, monsterToAdd]);
             }
         }
@@ -87,24 +120,32 @@ export default function EncounterCreator() {
 
     const handleSaveEncounter = async () => {
         const apiBaseUrl = "http://localhost:8000/api";
+        // FIX: Change `Token` to `Bearer` to match the backend's JWT configuration
+        const authToken = localStorage.getItem('access_token');
+
+        if (!authToken) {
+            alert("Authentication token not found. Please log in.");
+            navigate("/login");
+            return;
+        }
+
+        setIsSaving(true);
 
         try {
-            // 1. Prepare the nested data for players and monsters
             const playerPayload = selectedPlayers.map(player => ({
                 player_character: player.id,
-                initiative: 0,
-                current_hp: player.hp,
-                notes: "",
+                initiative: player.initiative,
+                current_hp: player.current_hp,
+                notes: player.notes,
             }));
 
             const monsterPayload = selectedMonsters.map(monster => ({
                 monster: monster.id,
-                initiative: 0,
-                current_hp: monster.hp,
-                notes: "",
+                initiative: monster.initiative,
+                current_hp: monster.current_hp,
+                notes: monster.notes,
             }));
 
-            // 2. Create the main Encounter object with nested player and monster data
             const payload = {
                 name: "My Encounter",
                 description: "",
@@ -116,13 +157,19 @@ export default function EncounterCreator() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    // FIX IS HERE: Change the prefix from 'Token' to 'Bearer'
+                    'Authorization': `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Failed to save encounter: ${response.status} ${response.statusText} - ${errorText}`);
+                if (response.status === 401) {
+                    throw new Error("Unauthorized. Your session may have expired. Please log in again.");
+                } else {
+                    throw new Error(`Failed to save encounter: ${response.status} ${response.statusText} - ${errorText}`);
+                }
             }
 
             const newEncounter = await response.json();
@@ -131,26 +178,24 @@ export default function EncounterCreator() {
 
         } catch (error) {
             console.error("Failed to save encounter:", error);
-            alert("Failed to save encounter. Check console for details.");
+            alert(`Failed to save encounter: ${error.message}`);
+        } finally {
+            setIsSaving(false);
+            navigate("/dashboard/encounters");
+            window.location.reload();
         }
-
-        // Redirect regardless of whether the try block succeeded or failed
-        navigate("/dashboard/encounters");
     };
-
 
     const partyXpThresholds = calculatePartyXpThresholds(selectedPlayers);
     const totalMonsterXp = calculateMonsterXp(selectedMonsters);
 
     const playerOptions = availablePlayers
-        .filter(player => !selectedPlayers.some(p => p.id === player.id))
         .map(player => ({
             value: player.id,
             label: player.character_name,
         }));
 
     const monsterOptions = availableMonsters
-        .filter(monster => !selectedMonsters.some(m => m.id === monster.id))
         .map(monster => ({
             value: monster.id,
             label: monster.name,
@@ -189,6 +234,7 @@ export default function EncounterCreator() {
                         />
                         <button
                             onClick={handleAddCustomPlayer}
+                            disabled={isCreatingCustom}
                             style={{
                                 padding: "8px 12px",
                                 backgroundColor: "#f0f0f0",
@@ -198,7 +244,7 @@ export default function EncounterCreator() {
                                 cursor: "pointer",
                             }}
                         >
-                            Add
+                            {isCreatingCustom ? "Creating..." : "Add"}
                         </button>
                     </div>
                     <Select
@@ -244,6 +290,7 @@ export default function EncounterCreator() {
                         />
                         <button
                             onClick={handleAddCustomMonster}
+                            disabled={isCreatingCustom}
                             style={{
                                 padding: "8px 12px",
                                 backgroundColor: "#f0f0f0",
@@ -253,7 +300,7 @@ export default function EncounterCreator() {
                                 cursor: "pointer",
                             }}
                         >
-                            Add
+                            {isCreatingCustom ? "Creating..." : "Add"}
                         </button>
                     </div>
                     <Select
@@ -287,6 +334,7 @@ export default function EncounterCreator() {
                     xpThresholds={partyXpThresholds}
                     totalMonsterXp={totalMonsterXp}
                     onSave={handleSaveEncounter}
+                    isSaving={isSaving}
                 />
             </div>
         </div>
