@@ -120,28 +120,39 @@ export default function EncounterCreator() {
 
         try {
             const playerPayload = selectedPlayers.map(player => {
+                // For both custom and existing players, use the 'name' field
+                // if it exists, otherwise use 'character_name' or a default
+                const playerName = player.name || player.character_name || "Unnamed Character";
+
                 if (player.id > 0) { // Existing player
                     return {
                         player_character: player.id,
+                        name: playerName, // Corrected line: Add the name
                         initiative: player.initiative,
                         current_hp: player.current_hp,
                         notes: player.notes,
+                        ac: player.ac,
                     };
                 } else { // Custom player
                     return {
-                        name: player.name,
+                        name: playerName, // Corrected line: Use the determined name
                         player_character: null,
                         initiative: player.initiative,
                         current_hp: player.current_hp,
                         notes: player.notes,
+                        ac: player.ac,
                     };
                 }
             });
 
             const monsterPayload = selectedMonsters.map(monster => {
+                // For both custom and existing monsters, use the 'name' field
+                const monsterName = monster.name || "Unnamed Monster";
+
                 if (monster.id > 0) { // Existing monster
                     return {
                         monster: monster.id,
+                        name: monsterName, // Corrected line: Add the name
                         initiative: monster.initiative,
                         current_hp: monster.current_hp,
                         notes: monster.notes,
@@ -149,7 +160,7 @@ export default function EncounterCreator() {
                     };
                 } else { // Custom monster
                     return {
-                        name: monster.name,
+                        name: monsterName, // Corrected line: Use the determined name
                         monster: null,
                         initiative: monster.initiative,
                         current_hp: monster.current_hp,
@@ -160,7 +171,6 @@ export default function EncounterCreator() {
             });
 
             const payload = {
-                // Use the encounterName from state
                 name: encounterName,
                 description: "",
                 player_data: playerPayload,

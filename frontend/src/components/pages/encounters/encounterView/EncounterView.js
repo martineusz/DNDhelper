@@ -89,11 +89,11 @@ export default function EncounterView() {
         const fetchedEncounter = response.data;
         setEncounter(fetchedEncounter);
 
-        // Combine players and monsters into a single array for the tracker
         const combinedParticipants = [
           ...fetchedEncounter.player_data.map((p, index) => ({
             ...p,
             type: "player",
+            // Correctly set display name from nested object or name field
             display_name: p.player_character?.character_name || p.name,
             original_id: p.player_character?.id,
             // Use a temporary unique ID for rendering and state updates
@@ -102,6 +102,7 @@ export default function EncounterView() {
           ...fetchedEncounter.monster_data.map((m, index) => ({
             ...m,
             type: "monster",
+            // Correctly set display name from nested object or name field
             display_name: m.monster?.name || m.name,
             ac: m.ac,
             original_id: m.monster?.id,

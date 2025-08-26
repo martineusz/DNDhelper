@@ -30,7 +30,7 @@ class EncounterAdmin(admin.ModelAdmin):
 
 @admin.register(PlayerEncounterData)
 class PlayerEncounterDataAdmin(admin.ModelAdmin):
-    list_display = ("player_character", "encounter", "initiative", "current_hp")
+    list_display = ("player_character", "encounter", "initiative", "current_hp", "ac")
     search_fields = ("player_character__character_name", "notes")
     list_filter = ("encounter",)
     list_editable = ("initiative", "current_hp")
@@ -40,7 +40,7 @@ class PlayerEncounterDataAdmin(admin.ModelAdmin):
 
 @admin.register(MonsterEncounterData)
 class MonsterEncounterDataAdmin(admin.ModelAdmin):
-    list_display = ("monster", "encounter", "initiative", "current_hp")
+    list_display = ("monster", "encounter", "initiative", "current_hp", "ac")
     search_fields = ("monster__name", "notes")
     list_filter = ("encounter",)
     list_editable = ("initiative", "current_hp")

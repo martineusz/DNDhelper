@@ -35,6 +35,7 @@ class PlayerEncounterData(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     initiative = models.IntegerField(blank=True, null=True)
     current_hp = models.IntegerField(blank=True, null=True)
+    ac = models.IntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -57,7 +58,6 @@ class MonsterEncounterData(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     initiative = models.IntegerField(blank=True, null=True)
     current_hp = models.IntegerField(blank=True, null=True)
-    # FIX: Add AC field to MonsterEncounterData
     ac = models.IntegerField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
