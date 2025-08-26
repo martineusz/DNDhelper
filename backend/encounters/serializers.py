@@ -1,4 +1,3 @@
-# encounters/serializers.py (updated)
 from rest_framework import serializers
 
 from compendium.models import Monster
@@ -37,10 +36,10 @@ class PlayerEncounterDataSerializer(serializers.ModelSerializer):
 
 
 class MonsterEncounterDataSerializer(serializers.ModelSerializer):
-    # This field is for display purposes, so it remains read-only
+    
     monster = MonsterNestedSerializer(read_only=True)
 
-    # We need a field to accept the monster ID on write
+    
     monster_id = serializers.PrimaryKeyRelatedField(
         queryset=Monster.objects.all(),
         source='monster',
@@ -70,12 +69,12 @@ class EncounterSerializer(serializers.ModelSerializer):
         encounter = Encounter.objects.create(**validated_data)
 
         for player_item in player_data:
-            # Remove 'id' if present to avoid forcing PK on create
+            
             player_item.pop('id', None)
             PlayerEncounterData.objects.create(encounter=encounter, **player_item)
 
         for monster_item in monster_data:
-            # Remove 'id' if present to avoid forcing PK on create
+            
             monster_item.pop('id', None)
             MonsterEncounterData.objects.create(encounter=encounter, **monster_item)
 
@@ -85,49 +84,49 @@ class EncounterSerializer(serializers.ModelSerializer):
         player_data = validated_data.pop('player_data', [])
         monster_data = validated_data.pop('monster_data', [])
 
-        # Update parent fields
+        
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.save()
 
-        # Update or create PlayerEncounterData instances
+        
         player_data_ids = [item.get('id') for item in player_data if 'id' in item]
         for player_item in player_data:
             player_id = player_item.get('id')
             if player_id:
-                # Update existing instance
+                
                 player_instance = PlayerEncounterData.objects.get(id=player_id, encounter=instance)
                 for key, value in player_item.items():
                     if key != 'id':
                         setattr(player_instance, key, value)
                 player_instance.save()
             else:
-                # Create new instance
-                # Remove 'id' if somehow present
+                
+                
                 player_item.pop('id', None)
                 PlayerEncounterData.objects.create(encounter=instance, **player_item)
 
-        # Delete old player data instances not in the new list
+        
         PlayerEncounterData.objects.filter(encounter=instance).exclude(id__in=player_data_ids).delete()
 
-        # Update or create MonsterEncounterData instances
+        
         monster_data_ids = [item.get('id') for item in monster_data if 'id' in item]
         for monster_item in monster_data:
             monster_id = monster_item.get('id')
             if monster_id:
-                # Update existing instance
+                
                 monster_instance = MonsterEncounterData.objects.get(id=monster_id, encounter=instance)
                 for key, value in monster_item.items():
                     if key != 'id':
                         setattr(monster_instance, key, value)
                 monster_instance.save()
             else:
-                # Create new instance
-                # Remove 'id' if somehow present
+                
+                
                 monster_item.pop('id', None)
                 MonsterEncounterData.objects.create(encounter=instance, **monster_item)
 
-        # Delete old monster data instances not in the new list
+        
         MonsterEncounterData.objects.filter(encounter=instance).exclude(id__in=monster_data_ids).delete()
 
         return instance
