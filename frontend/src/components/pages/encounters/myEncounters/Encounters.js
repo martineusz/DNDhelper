@@ -5,19 +5,26 @@ import "./Encounters.css";
 
 // Reusable component for a single encounter card.
 function EncounterCard({ encounter, onCardClick }) {
+  // Extract the first three player names
+  const playerNames = encounter.player_data
+    .slice(0, 3)
+    .map((p) => p.player_character ? p.player_character.character_name : p.name);
+  const playerNamesString = playerNames.join(", ");
+
+  // Extract the first three monster names
+  const monsterNames = encounter.monster_data
+    .slice(0, 3)
+    .map((m) => m.monster ? m.monster.name : m.name);
+  const monsterNamesString = monsterNames.join(", ");
+
   return (
     <div onClick={() => onCardClick(encounter)} className="encounter-card">
       <h3>{encounter.name}</h3>
       <p>
-        {encounter.description
-          ? encounter.description.substring(0, 50) + "..."
-          : "No description."}
+        <strong>Players:</strong> {encounter.player_data.length} ({playerNamesString})
       </p>
       <p>
-        <strong>Players:</strong> {encounter.player_data.length}
-      </p>
-      <p>
-        <strong>Monsters:</strong> {encounter.monster_data.length}
+        <strong>Monsters:</strong> {encounter.monster_data.length} ({monsterNamesString})
       </p>
     </div>
   );
@@ -63,7 +70,8 @@ export default function Encounters() {
   async function fetchEncounters() {
     try {
       setLoading(true);
-      const response = await API.get("encounters/");
+      // Change the API endpoint to fetch only the current user's encounters
+      const response = await API.get("encounters/my_encounters/");
       setEncounters(response.data);
     } catch (err) {
       setError(err.response?.data?.detail || err.message);

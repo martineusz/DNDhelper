@@ -8,9 +8,6 @@ import {useEncounterData} from "./hooks/useEncounterData";
 import {calculateMonsterXp, calculatePartyXpThresholds} from "./utils/EncounterCalculations";
 import "./EncounterCreator.css";
 
-// This import assumes your api.js is located four directories up.
-// Adjust the path if your file structure is different.
-
 export default function EncounterCreator() {
     const {availablePlayers, availableMonsters, loading, error, refreshData} = useEncounterData();
     const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -18,25 +15,23 @@ export default function EncounterCreator() {
     const [customPlayerName, setCustomPlayerName] = useState("");
     const [customMonsterName, setCustomMonsterName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
-    // The previous state `isCreatingCustom` is no longer needed because we're not making an API call for custom entries.
+    // State for the user-defined encounter name
+    const [encounterName, setEncounterName] = useState("Encounter Name");
 
     const navigate = useNavigate();
 
     const handleAddCustomPlayer = () => {
         if (!customPlayerName) return;
 
-        // Create a temporary object with a unique ID for React's key prop
-        // The id is a negative number to distinguish it from database IDs
+        // Create a temporary object with a unique negative ID to distinguish from database IDs
         const newPlayer = {
             id: -(new Date().getTime()),
             name: customPlayerName,
-            // FIX: Set initiative and HP to 0 by default for new entries
             initiative: 0,
             current_hp: 0,
             notes: "",
         };
 
-        // Add the temporary object directly to the selected list
         setSelectedPlayers([...selectedPlayers, newPlayer]);
         setCustomPlayerName("");
     };
@@ -44,38 +39,31 @@ export default function EncounterCreator() {
     const handleAddCustomMonster = () => {
         if (!customMonsterName) return;
 
-        // Create a temporary object with a unique ID for React's key prop
-        // The id is a negative number to distinguish it from database IDs
+        // Create a temporary object with a unique negative ID
         const newMonster = {
             id: -(new Date().getTime()),
             name: customMonsterName,
-            // FIX: Set initiative, HP, and AC to 0 by default for new entries
             initiative: 0,
             current_hp: 0,
             ac: 0,
             notes: "",
-            // Add other monster properties if needed for summary
             cr: "0",
             xp: 0,
         };
 
-        // Add the temporary object directly to the selected list
         setSelectedMonsters([...selectedMonsters, newMonster]);
         setCustomMonsterName("");
     };
-
 
     const handlePlayerSelect = (selectedOption) => {
         if (selectedOption) {
             const playerToAdd = availablePlayers.find(p => p.id === selectedOption.value);
             if (playerToAdd) {
-                // FIX: Create a new object with all required fields
                 const newPlayer = {
                     ...playerToAdd,
                     initiative: playerToAdd.initiative || 0,
                     current_hp: playerToAdd.hp || 0,
                     notes: playerToAdd.notes || "",
-                    // Add other properties if needed
                 };
                 setSelectedPlayers([...selectedPlayers, newPlayer]);
             }
@@ -86,7 +74,6 @@ export default function EncounterCreator() {
         if (selectedOption) {
             const monsterToAdd = availableMonsters.find(m => m.id === selectedOption.value);
             if (monsterToAdd) {
-                // FIX: Create a new object with all required fields
                 const newMonster = {
                     ...monsterToAdd,
                     initiative: monsterToAdd.initiative || 0,
@@ -132,7 +119,6 @@ export default function EncounterCreator() {
         setIsSaving(true);
 
         try {
-            // Check each player: if it has an ID, use it. If not, use the custom name.
             const playerPayload = selectedPlayers.map(player => {
                 if (player.id > 0) { // Existing player
                     return {
@@ -143,8 +129,8 @@ export default function EncounterCreator() {
                     };
                 } else { // Custom player
                     return {
-                        name: player.name, // Use the new 'name' field
-                        player_character: null, // Ensure the FK is null
+                        name: player.name,
+                        player_character: null,
                         initiative: player.initiative,
                         current_hp: player.current_hp,
                         notes: player.notes,
@@ -152,7 +138,6 @@ export default function EncounterCreator() {
                 }
             });
 
-            // Check each monster: if it has an ID, use it. If not, use the custom name.
             const monsterPayload = selectedMonsters.map(monster => {
                 if (monster.id > 0) { // Existing monster
                     return {
@@ -160,24 +145,23 @@ export default function EncounterCreator() {
                         initiative: monster.initiative,
                         current_hp: monster.current_hp,
                         notes: monster.notes,
-                        // FIX: Ensure AC is included for existing monsters
                         ac: monster.ac,
                     };
                 } else { // Custom monster
                     return {
-                        name: monster.name, // Use the new 'name' field
-                        monster: null, // Ensure the FK is null
+                        name: monster.name,
+                        monster: null,
                         initiative: monster.initiative,
                         current_hp: monster.current_hp,
                         notes: monster.notes,
-                        // FIX: Ensure AC is included for custom monsters
                         ac: monster.ac,
                     };
                 }
             });
 
             const payload = {
-                name: "My Encounter",
+                // Use the encounterName from state
+                name: encounterName,
                 description: "",
                 player_data: playerPayload,
                 monster_data: monsterPayload,
@@ -202,8 +186,6 @@ export default function EncounterCreator() {
             }
 
             const newEncounter = await response.json();
-            // Remove this line to prevent the success alert
-            // alert(`Encounter "${newEncounter.name}" saved successfully!`);
             console.log("Saved Encounter:", newEncounter);
 
         } catch (error) {
@@ -236,7 +218,21 @@ export default function EncounterCreator() {
 
     return (
         <div className="encounter-creator-container">
-            <h1>Encounter Creator</h1>
+            {/* Input field for the encounter name without full width */}
+            <input
+                type="text"
+                className="encounter-name-input"
+                placeholder="Encounter Name"
+                value={encounterName}
+                onChange={(e) => setEncounterName(e.target.value)}
+                style={{
+                    fontSize: "2rem",
+                    padding: "15px",
+                    boxSizing: "border-box",
+                    marginBottom: "20px",
+                    textAlign: "center"
+                }}
+            />
 
             <div style={{
                 display: "flex",
@@ -294,7 +290,6 @@ export default function EncounterCreator() {
                         {selectedPlayers.length > 0 && (
                             <div>
                                 {selectedPlayers.map((player) => (
-                                    // You may need to update PlayerRow to handle players without character_name
                                     <PlayerRow key={player.id} player={player} onUpdate={handlePlayerUpdate}
                                                onDelete={handlePlayerDelete}/>
                                 ))}
@@ -351,7 +346,6 @@ export default function EncounterCreator() {
                         {selectedMonsters.length > 0 && (
                             <div>
                                 {selectedMonsters.map((monster) => (
-                                    // You may need to update MonsterRow to handle monsters without the `name` field
                                     <MonsterRow key={monster.id} monster={monster} onUpdate={handleMonsterUpdate}
                                                 onDelete={handleMonsterDelete}/>
                                 ))}

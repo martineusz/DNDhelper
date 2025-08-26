@@ -1,101 +1,186 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../../../../api";
-import "../myEncounters/Encounters.css";
+import "./EncounterView.css";
 
+// A component for a single participant row, handling its own state for damage input
+function ParticipantRow({ participant, onUpdate, onDamage, onDetails }) {
+  const [damageTaken, setDamageTaken] = useState("");
+
+  const handleDamageChange = (e) => {
+    setDamageTaken(e.target.value);
+  };
+
+  const handleSubtractDamage = () => {
+    onDamage(participant.tempId, parseInt(damageTaken, 10) || 0);
+    setDamageTaken("");
+  };
+
+  const handleInputChange = (field) => (e) => {
+    onUpdate(participant.tempId, field, e.target.value);
+  };
+
+  return (
+    <div className="participant-row">
+      <input
+        type="number"
+        value={participant.initiative || ""}
+        placeholder="0"
+        onChange={handleInputChange("initiative")}
+      />
+      <div className="participant-name">
+        <span>{participant.display_name}</span>
+      </div>
+      <div className="hp-section">
+        <input
+          type="number"
+          value={participant.current_hp || ""}
+          placeholder="HP"
+          onChange={handleInputChange("current_hp")}
+        />
+        <div className="damage-input">
+          <input
+            type="number"
+            value={damageTaken}
+            placeholder="Damage"
+            onChange={handleDamageChange}
+          />
+          <button className="damage-button" onClick={handleSubtractDamage}>
+            - HP
+          </button>
+        </div>
+      </div>
+      <input
+        type="number"
+        value={participant.ac || ""}
+        placeholder="AC"
+        onChange={handleInputChange("ac")}
+      />
+      <input
+        type="text"
+        value={participant.notes || ""}
+        placeholder="Notes"
+        onChange={handleInputChange("notes")}
+      />
+      <button
+        className="details-button"
+        onClick={() => onDetails(participant)}
+        disabled={!participant.original_id}
+      >
+        Details
+      </button>
+    </div>
+  );
+}
+
+// The main Encounter View component
 export default function EncounterView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [encounter, setEncounter] = useState(null);
+  const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchEncounter = async () => {
       try {
-        setLoading(true);
-        // Ensure you are fetching the data with a valid token
         const response = await API.get(`encounters/${id}/`);
-        setEncounter(response.data);
+        const fetchedEncounter = response.data;
+        setEncounter(fetchedEncounter);
+
+        // Combine players and monsters into a single array for the tracker
+        const combinedParticipants = [
+          ...fetchedEncounter.player_data.map((p, index) => ({
+            ...p,
+            type: "player",
+            display_name: p.player_character?.character_name || p.name,
+            original_id: p.player_character?.id,
+            // Use a temporary unique ID for rendering and state updates
+            tempId: `player-${p.id || index}`,
+          })),
+          ...fetchedEncounter.monster_data.map((m, index) => ({
+            ...m,
+            type: "monster",
+            display_name: m.monster?.name || m.name,
+            ac: m.ac,
+            original_id: m.monster?.id,
+            // Use a temporary unique ID for rendering and state updates
+            tempId: `monster-${m.id || index}`,
+          })),
+        ];
+        setParticipants(combinedParticipants);
       } catch (err) {
         setError(err.response?.data?.detail || err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchEncounter();
   }, [id]);
 
-  if (loading) {
-    return <p>Loading encounter details...</p>;
-  }
+  const handleUpdateParticipant = (tempId, field, value) => {
+    setParticipants((prev) =>
+      prev.map((p) => (p.tempId === tempId ? { ...p, [field]: value } : p))
+    );
+  };
 
-  if (error) {
-    return <p style={{ color: "red" }}>Error: {error}</p>;
-  }
+  const handleDamage = (tempId, damage) => {
+    setParticipants((prev) =>
+      prev.map((p) => {
+        if (p.tempId === tempId) {
+          const newHp = Math.max(0, (parseInt(p.current_hp, 10) || 0) - damage);
+          return { ...p, current_hp: newHp };
+        }
+        return p;
+      })
+    );
+  };
 
-  if (!encounter) {
-    return <p>Encounter not found.</p>;
-  }
+  const handleDetailsClick = (participant) => {
+    if (participant.type === "player" && participant.original_id) {
+      navigate(`/dashboard/players/${participant.original_id}`);
+    } else if (participant.type === "monster" && participant.original_id) {
+      navigate(`/dashboard/compendium/${participant.original_id}`);
+    }
+  };
+
+  const sortedParticipants = [...participants].sort((a, b) => {
+    return (b.initiative || 0) - (a.initiative || 0);
+  });
+
+  if (loading) return <p>Loading encounter...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+  if (!encounter) return <p>Encounter not found.</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <button onClick={() => navigate(-1)} className="back-button">
-        &larr; Back to Encounters
-      </button>
+    <div className="encounter-view-container">
+      <div className="header-section">
+        <button onClick={() => navigate(-1)} className="back-button">
+          &larr; Back
+        </button>
+        <h1>{encounter.name}</h1>
+      </div>
+      <p className="description-text">{encounter.description}</p>
 
-      <h1>{encounter.name}</h1>
-      <p>{encounter.description}</p>
-      <hr />
-
-      <div className="section-container">
-        <div className="section-block">
-          <h3>Players</h3>
-          <ul className="detail-list">
-            {encounter.player_data.map((data) => (
-              <li key={data.id} className="detail-item">
-                <p>
-                  <strong>Name:</strong>{" "}
-                  {/* FIX: Check for the nested object or fall back to the custom name */}
-                  {data.player_character?.character_name || data.name}
-                </p>
-                <p>
-                  <strong>Initiative:</strong> {data.initiative || "0"}
-                </p>
-                <p>
-                  <strong>Current HP:</strong> {data.current_hp || "0"}
-                </p>
-                <p>
-                  <strong>Notes:</strong> {data.notes || "-"}
-                </p>
-              </li>
-            ))}
-          </ul>
+      <div className="participant-list-container">
+        <div className="participant-header">
+          <span>Initiative</span>
+          <span>Name</span>
+          <span>Current HP</span>
+          <span>AC</span>
+          <span>Notes</span>
+          <span>Details</span>
         </div>
-        <div className="section-block">
-          <h3>Monsters</h3>
-          <ul className="detail-list">
-            {encounter.monster_data.map((data) => (
-              <li key={data.id} className="detail-item">
-                <p>
-                  <strong>Name:</strong>{" "}
-                  {/* FIX: Check for the nested object or fall back to the custom name */}
-                  {data.monster?.name || data.name}
-                </p>
-                <p>
-                  <strong>Initiative:</strong> {data.initiative || "0"}
-                </p>
-                <p>
-                  <strong>Current HP:</strong> {data.current_hp || "0"}
-                </p>
-                <p>
-                  <strong>Notes:</strong> {data.notes || "-"}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {sortedParticipants.map((p) => (
+          <ParticipantRow
+            key={p.tempId}
+            participant={p}
+            onUpdate={handleUpdateParticipant}
+            onDamage={handleDamage}
+            onDetails={handleDetailsClick}
+          />
+        ))}
       </div>
     </div>
   );
