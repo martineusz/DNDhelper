@@ -1,4 +1,4 @@
-# encounters/serializers.py
+# encounters/serializers.py (updated)
 from rest_framework import serializers
 
 from compendium.models import Monster
@@ -6,7 +6,6 @@ from player_characters.models import PlayerCharacter
 from .models import Encounter, PlayerEncounterData, MonsterEncounterData
 
 
-# Nested serializers remain the same as they are for read-only purposes
 class PlayerCharacterNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerCharacter
@@ -19,13 +18,9 @@ class MonsterNestedSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-# Writable serializers for PlayerEncounterData and MonsterEncounterData
-# These serializers will handle the creation and updating of the nested models
 class PlayerEncounterDataSerializer(serializers.ModelSerializer):
-    # This field is for display purposes, so it remains read-only
     player_character = PlayerCharacterNestedSerializer(read_only=True)
 
-    # We need a field to accept the player_character ID on write
     player_character_id = serializers.PrimaryKeyRelatedField(
         queryset=PlayerCharacter.objects.all(),
         source='player_character',
@@ -33,10 +28,12 @@ class PlayerEncounterDataSerializer(serializers.ModelSerializer):
         allow_null=True
     )
 
+    id = serializers.IntegerField(required=False, allow_null=True)
+
     class Meta:
         model = PlayerEncounterData
         fields = ["id", "player_character", "player_character_id", "name", "initiative", "current_hp", "ac",
-                  "notes"] # 'ac' is now included
+                  "notes"]
 
 
 class MonsterEncounterDataSerializer(serializers.ModelSerializer):
@@ -50,6 +47,8 @@ class MonsterEncounterDataSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+
+    id = serializers.IntegerField(required=False, allow_null=True)
 
     class Meta:
         model = MonsterEncounterData
@@ -71,9 +70,13 @@ class EncounterSerializer(serializers.ModelSerializer):
         encounter = Encounter.objects.create(**validated_data)
 
         for player_item in player_data:
+            # Remove 'id' if present to avoid forcing PK on create
+            player_item.pop('id', None)
             PlayerEncounterData.objects.create(encounter=encounter, **player_item)
 
         for monster_item in monster_data:
+            # Remove 'id' if present to avoid forcing PK on create
+            monster_item.pop('id', None)
             MonsterEncounterData.objects.create(encounter=encounter, **monster_item)
 
         return encounter
@@ -95,10 +98,13 @@ class EncounterSerializer(serializers.ModelSerializer):
                 # Update existing instance
                 player_instance = PlayerEncounterData.objects.get(id=player_id, encounter=instance)
                 for key, value in player_item.items():
-                    setattr(player_instance, key, value)
+                    if key != 'id':
+                        setattr(player_instance, key, value)
                 player_instance.save()
             else:
                 # Create new instance
+                # Remove 'id' if somehow present
+                player_item.pop('id', None)
                 PlayerEncounterData.objects.create(encounter=instance, **player_item)
 
         # Delete old player data instances not in the new list
@@ -112,10 +118,13 @@ class EncounterSerializer(serializers.ModelSerializer):
                 # Update existing instance
                 monster_instance = MonsterEncounterData.objects.get(id=monster_id, encounter=instance)
                 for key, value in monster_item.items():
-                    setattr(monster_instance, key, value)
+                    if key != 'id':
+                        setattr(monster_instance, key, value)
                 monster_instance.save()
             else:
                 # Create new instance
+                # Remove 'id' if somehow present
+                monster_item.pop('id', None)
                 MonsterEncounterData.objects.create(encounter=instance, **monster_item)
 
         # Delete old monster data instances not in the new list
