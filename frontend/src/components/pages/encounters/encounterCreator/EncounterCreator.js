@@ -10,7 +10,6 @@ import "./EncounterCreator.css";
 
 // This import assumes your api.js is located four directories up.
 // Adjust the path if your file structure is different.
-import API from "../../../../api";
 
 export default function EncounterCreator() {
     const {availablePlayers, availableMonsters, loading, error, refreshData} = useEncounterData();
@@ -87,14 +86,14 @@ export default function EncounterCreator() {
         if (selectedOption) {
             const monsterToAdd = availableMonsters.find(m => m.id === selectedOption.value);
             if (monsterToAdd) {
-                 // FIX: Create a new object with all required fields
-                 const newMonster = {
-                     ...monsterToAdd,
-                     initiative: monsterToAdd.initiative || 0,
-                     current_hp: monsterToAdd.hp || 0,
-                     ac: monsterToAdd.ac || 0,
-                     notes: monsterToAdd.notes || "",
-                 };
+                // FIX: Create a new object with all required fields
+                const newMonster = {
+                    ...monsterToAdd,
+                    initiative: monsterToAdd.initiative || 0,
+                    current_hp: monsterToAdd.hp || 0,
+                    ac: monsterToAdd.ac || 0,
+                    notes: monsterToAdd.notes || "",
+                };
                 setSelectedMonsters([...selectedMonsters, newMonster]);
             }
         }
@@ -203,7 +202,8 @@ export default function EncounterCreator() {
             }
 
             const newEncounter = await response.json();
-            alert(`Encounter "${newEncounter.name}" saved successfully!`);
+            // Remove this line to prevent the success alert
+            // alert(`Encounter "${newEncounter.name}" saved successfully!`);
             console.log("Saved Encounter:", newEncounter);
 
         } catch (error) {

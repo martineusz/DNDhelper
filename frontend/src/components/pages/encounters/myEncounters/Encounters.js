@@ -23,6 +23,34 @@ function EncounterCard({ encounter, onCardClick }) {
   );
 }
 
+// New component for the "add" button
+function AddEncounterCard({ onCardClick }) {
+  return (
+    <div
+      onClick={onCardClick}
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        border: "2px dashed #ccc",
+        borderRadius: "8px",
+        padding: "16px",
+        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#f9f9f9",
+        cursor: "pointer",
+        transition: "transform 0.2s ease-in-out",
+        fontSize: "4rem",
+        color: "#ccc",
+        minHeight: "150px",
+      }}
+      onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+      onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+    >
+      +
+    </div>
+  );
+}
+
 // Main component to display all encounters.
 export default function Encounters() {
   const [encounters, setEncounters] = useState([]);
@@ -53,10 +81,14 @@ export default function Encounters() {
     fetchEncounters();
   }, [token]);
 
-  // Handle click to navigate to a new page
+  // Handle click to navigate to an existing encounter's details page
   const handleCardClick = (encounter) => {
-    // This is the fix: use a relative path
     navigate(`${encounter.id}`);
+  };
+
+  // Handle click to navigate to the new encounter creation page
+  const handleNewEncounterClick = () => {
+    navigate("../encounter-creator");
   };
 
   if (loading) return <p>Loading encounters...</p>;
@@ -65,7 +97,7 @@ export default function Encounters() {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Encounters</h1>
-      <p>Click on an encounter card to view its details.</p>
+      <p>Click on an encounter card to view its details, or create a new one.</p>
       <div
         style={{
           display: "grid",
@@ -81,6 +113,8 @@ export default function Encounters() {
             onCardClick={handleCardClick}
           />
         ))}
+        {/* Add the new card component here */}
+        <AddEncounterCard onCardClick={handleNewEncounterClick} />
       </div>
     </div>
   );
