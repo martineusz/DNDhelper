@@ -1,4 +1,3 @@
-# compendium/management/commands/load_spell_data.py
 import os
 
 import pandas as pd
@@ -33,10 +32,10 @@ class Command(BaseCommand):
             created_count = 0
 
             for _, row in df.iterrows():
-                # Ensure classes column is stored as a list
+                
                 classes_list = row['classes']
                 if isinstance(classes_list, str):
-                    # Assuming classes are comma-separated in CSV
+                    
                     classes_list = [cls.strip() for cls in classes_list.split(',')]
 
                 spell, created = Spell.objects.get_or_create(

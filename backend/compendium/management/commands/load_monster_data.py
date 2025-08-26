@@ -1,8 +1,7 @@
-# compendium/management/commands/load_monster_data.py
 import os
 import pandas as pd
 from django.core.management.base import BaseCommand
-from compendium.models import Monster  # Make sure this is the correct import path
+from compendium.models import Monster  
 
 class Command(BaseCommand):
     help = 'Load DnD compendium from a CSV file into the database'
@@ -30,7 +29,7 @@ class Command(BaseCommand):
             created_count = 0
 
             for _, row in df.iterrows():
-                # Use get_or_create to avoid duplicates if needed
+                
                 monster, created = Monster.objects.get_or_create(
                     name=row['name'],
                     defaults={

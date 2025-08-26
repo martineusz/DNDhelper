@@ -1,56 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 const PlayerRow = ({ player, onUpdate, onDelete }) => {
-  const [editedPlayer, setEditedPlayer] = useState(player);
+  // Logic to determine the display name
+  const nameToDisplay = player.character_name || player.name || "Unnamed Character";
 
-  const handleNameChange = (e) => {
-    const combinedValue = e.target.value;
-    const match = combinedValue.match(/(.*?)\s*\((.*?)\)$/);
-
-    if (match) {
-      setEditedPlayer(prevPlayer => ({
-        ...prevPlayer,
-        character_name: match[1].trim(),
-        player_name: match[2].trim(),
-      }));
-    } else {
-      setEditedPlayer(prevPlayer => ({
-        ...prevPlayer,
-        character_name: combinedValue,
-        player_name: "",
-      }));
-    }
-  };
-
+  // This single handler updates the player object with any stat change
   const handleStatChange = (e) => {
     const { name, value } = e.target;
-    setEditedPlayer(prevPlayer => ({
-      ...prevPlayer,
-      [name]: Number(value) || value,
-    }));
+    onUpdate({
+      ...player,
+      [name]: Number(value) || value, // Convert to number, but handle non-numeric input
+    });
   };
 
-  useEffect(() => {
-    onUpdate(editedPlayer);
-  }, [editedPlayer, onUpdate]);
-
-  const combinedName = `${editedPlayer.character_name} (${editedPlayer.player_name})`;
+  // This handler is for the name field, which is handled differently
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    onUpdate({
+      ...player,
+      name: value,
+    });
+  };
 
   return (
     <div className="player-row">
       <p>
         <input
           type="text"
-          value={combinedName}
+          // FIX: Use 'player.name' for custom players and 'player.character_name' for existing ones
+          value={player.name || player.character_name || ''}
           onChange={handleNameChange}
           style={{ fontWeight: "bold", border: "none", width: "250px" }}
         />
         <br />
-        Level: <input type="number" name="character_level" value={editedPlayer.character_level} onChange={handleStatChange} style={{ width: "50px" }} />
-        | HP: <input type="number" name="hp" value={editedPlayer.hp} onChange={handleStatChange} style={{ width: "50px" }} />
-        | AC: <input type="number" name="ac" value={editedPlayer.ac} onChange={handleStatChange} style={{ width: "50px" }} />
-        {editedPlayer.url && (
-          <a href={editedPlayer.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "10px", textDecoration: "none" }}>
+        Level: <input type="number" name="character_level" value={player.character_level || ''} onChange={handleStatChange} style={{ width: "50px" }} />
+        | HP: <input type="number" name="current_hp" value={player.current_hp || ''} onChange={handleStatChange} style={{ width: "50px" }} />
+        | AC: <input type="number" name="ac" value={player.ac || ''} onChange={handleStatChange} style={{ width: "50px" }} />
+        {player.url && (
+          <a href={player.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "10px", textDecoration: "none" }}>
             Details
           </a>
         )}

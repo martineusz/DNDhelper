@@ -1,30 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 const MonsterRow = ({ monster, onUpdate, onDelete }) => {
-  const [editedMonster, setEditedMonster] = useState(monster);
-
+  // This single handler updates the monster object with any stat change
   const handleStatChange = (e) => {
     const { name, value } = e.target;
-    setEditedMonster(prevMonster => ({
-      ...prevMonster,
+    onUpdate({
+      ...monster,
       [name]: name === 'cr' ? value : Number(value) || value,
-    }));
+    });
   };
 
-  useEffect(() => {
-    onUpdate(editedMonster);
-  }, [editedMonster, onUpdate]);
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    onUpdate({
+      ...monster,
+      name: value,
+    });
+  };
 
   return (
     <div className="monster-row">
       <p>
-        <input type="text" name="name" value={editedMonster.name} onChange={handleStatChange} style={{ fontWeight: "bold", border: "none", width: "200px" }} />
+        <input
+          type="text"
+          name="name"
+          // FIX: The value should always be linked to monster.name
+          value={monster.name || ''}
+          onChange={handleNameChange}
+          style={{ fontWeight: "bold", border: "none", width: "200px" }}
+        />
         <br />
-        CR: <input type="text" name="cr" value={editedMonster.cr} onChange={handleStatChange} style={{ width: "50px" }} />
-        | HP: <input type="number" name="hp" value={editedMonster.hp} onChange={handleStatChange} style={{ width: "50px" }} />
-        | AC: <input type="number" name="ac" value={editedMonster.ac} onChange={handleStatChange} style={{ width: "50px" }} />
-        {editedMonster.url && (
-          <a href={editedMonster.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "10px", textDecoration: "none" }}>
+        CR: <input type="text" name="cr" value={monster.cr || ''} onChange={handleStatChange} style={{ width: "50px" }} />
+        | HP: <input type="number" name="current_hp" value={monster.current_hp || ''} onChange={handleStatChange} style={{ width: "50px" }} />
+        | AC: <input type="number" name="ac" value={monster.ac || ''} onChange={handleStatChange} style={{ width: "50px" }} />
+        {monster.url && (
+          <a href={monster.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "10px", textDecoration: "none" }}>
             Details
           </a>
         )}
