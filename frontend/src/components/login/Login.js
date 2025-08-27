@@ -1,20 +1,13 @@
 import {useState} from "react";
-import {useNavigate, Link} from "react-router-dom"; // Import Link
+import {Link, useNavigate} from "react-router-dom"; // Import Link
 import {login} from "../../api";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Label } from "../ui/label";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "../ui/card";
+import {Input} from "../ui/input";
+import {Button} from "../ui/button";
+import {Label} from "../ui/label";
 import dndLogo from '../../assets/logo512.png';
 
-export default function Login({ setIsLoggedIn }) {
+export default function Login({setIsLoggedIn}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -25,6 +18,7 @@ export default function Login({ setIsLoggedIn }) {
         try {
             const data = await login(username, password);
             localStorage.setItem("access_token", data.access);
+            localStorage.setItem("username", username);   // 👈 save username
             setIsLoggedIn(true);
             navigate("/dashboard/encounters");
         } catch (err) {
@@ -37,7 +31,7 @@ export default function Login({ setIsLoggedIn }) {
             <Card className="w-full max-w-sm border-green-200 bg-white">
                 <CardHeader className="space-y-1 text-center">
                     <div className="flex justify-center mb-4">
-                        <img src={dndLogo} alt="DNDHelper Logo" className="h-20 w-20" />
+                        <img src={dndLogo} alt="DNDHelper Logo" className="h-20 w-20"/>
                     </div>
                     <CardTitle className="text-4xl font-extrabold text-green-800">DNDHelper</CardTitle>
                     <CardDescription className="text-green-600">
@@ -75,7 +69,8 @@ export default function Login({ setIsLoggedIn }) {
                             Login
                         </Button>
                         <Link to="/register" className="w-full">
-                            <Button type="button" variant="outline" className="w-full bg-green-100 text-green-700 hover:bg-green-200">
+                            <Button type="button" variant="outline"
+                                    className="w-full bg-green-100 text-green-700 hover:bg-green-200">
                                 Register
                             </Button>
                         </Link>
