@@ -3,11 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../../api";
 import { Input } from "../../../ui/input";
 import { Button } from "../../../ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../ui/card";
+import { Card } from "../../../ui/card";
 import { Label } from "../../../ui/label";
 
 // A component for a single participant row, handling its own state for damage input
-function ParticipantRow({ participant, onUpdate, onDamage, onDetails }) {
+function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
   const [damageTaken, setDamageTaken] = useState("");
 
   const handleDamageChange = (e) => {
@@ -24,27 +24,30 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDetails }) {
   };
 
   return (
-    <Card className="flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-50 border border-gray-200 shadow-sm">
+    <Card className="flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm">
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 flex-grow">
         <div className="flex flex-col">
-          <Label htmlFor={`initiative-${participant.tempId}`} className="text-xs text-gray-500">Initiative</Label>
+          <Label htmlFor={`initiative-${participant.tempId}`} className="text-xs text-green-600">Initiative</Label>
           <Input
             id={`initiative-${participant.tempId}`}
             type="number"
             value={participant.initiative || ""}
             placeholder="0"
             onChange={handleInputChange("initiative")}
-            className="bg-gray-100 border-gray-200"
+            className="bg-green-50 border-green-200"
           />
         </div>
-        <div className="flex flex-col col-span-2 sm:col-span-1">
-          <Label className="text-xs text-gray-500">Name</Label>
-          <span className="font-semibold text-base break-words text-gray-800">
-            {participant.display_name}
-          </span>
+        <div className="flex flex-col col-span-1">
+          <Label className="text-xs text-green-600">Name</Label>
+          <Input
+            type="text"
+            value={participant.display_name}
+            onChange={handleInputChange("display_name")}
+            className="bg-green-50 border-green-200"
+          />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`hp-${participant.tempId}`} className="text-xs text-gray-500">HP</Label>
+          <Label htmlFor={`hp-${participant.tempId}`} className="text-xs text-green-600">HP</Label>
           <div className="flex items-center gap-2">
             <Input
               id={`hp-${participant.tempId}`}
@@ -52,20 +55,20 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDetails }) {
               value={participant.current_hp || ""}
               placeholder="HP"
               onChange={handleInputChange("current_hp")}
-              className="bg-gray-100 border-gray-200 w-16"
+              className="bg-green-50 border-green-200 w-16"
             />
             <div className="flex flex-grow items-center">
               <Input
                 type="number"
                 value={damageTaken}
-                placeholder="Damage"
+                placeholder="Dmg"
                 onChange={handleDamageChange}
-                className="bg-gray-100 border-gray-200 w-20"
+                className="bg-green-50 border-green-200 w-20"
               />
               <Button
                 variant="outline"
                 size="icon"
-                className="ml-1 shrink-0 text-white bg-red-600 hover:bg-red-500 border-red-700"
+                className="ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950"
                 onClick={handleSubtractDamage}
               >
                 -
@@ -74,36 +77,38 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDetails }) {
           </div>
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`ac-${participant.tempId}`} className="text-xs text-gray-500">AC</Label>
+          <Label htmlFor={`ac-${participant.tempId}`} className="text-xs text-green-600">AC</Label>
           <Input
             id={`ac-${participant.tempId}`}
             type="number"
             value={participant.ac || ""}
             placeholder="AC"
             onChange={handleInputChange("ac")}
-            className="bg-gray-100 border-gray-200"
+            className="bg-green-50 border-green-200"
           />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`notes-${participant.tempId}`} className="text-xs text-gray-500">Notes</Label>
+          <Label htmlFor={`notes-${participant.tempId}`} className="text-xs text-green-600">Notes</Label>
           <Input
             id={`notes-${participant.tempId}`}
             type="text"
             value={participant.notes || ""}
             placeholder="Notes"
             onChange={handleInputChange("notes")}
-            className="bg-gray-100 border-gray-200"
+            className="bg-green-50 border-green-200"
           />
         </div>
       </div>
-      <Button
-        onClick={() => onDetails(participant)}
-        variant="outline"
-        disabled={!participant.original_id}
-        className="mt-4 md:mt-0 w-full md:w-auto"
-      >
-        Details
-      </Button>
+      <div className="flex items-center justify-end md:ml-4 mt-2 md:mt-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white bg-green-900 hover:bg-green-800 border-green-950 mr-2"
+          onClick={() => onDelete(participant.tempId)}
+        >
+          Delete
+        </Button>
+      </div>
     </Card>
   );
 }
@@ -113,6 +118,7 @@ export default function EncounterView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [encounter, setEncounter] = useState(null);
+  const [editableName, setEditableName] = useState("");
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -124,6 +130,7 @@ export default function EncounterView() {
         const response = await API.get(`encounters/${id}/`);
         const fetchedEncounter = response.data;
         setEncounter(fetchedEncounter);
+        setEditableName(fetchedEncounter.name);
 
         const combinedParticipants = [
           ...fetchedEncounter.player_data.map((p, index) => ({
@@ -158,6 +165,10 @@ export default function EncounterView() {
     );
   };
 
+  const handleNameChange = (e) => {
+    setEditableName(e.target.value);
+  };
+
   const handleDamage = (tempId, damage) => {
     setParticipants((prev) =>
       prev.map((p) => {
@@ -170,12 +181,48 @@ export default function EncounterView() {
     );
   };
 
-  const handleDetailsClick = (participant) => {
-    if (participant.type === "player" && participant.original_id) {
-      navigate(`/dashboard/players/${participant.original_id}`);
-    } else if (participant.type === "monster" && participant.original_id) {
-      navigate(`/dashboard/compendium/${participant.original_id}`);
+  const handleDeleteParticipant = async (tempId) => {
+    const participantToDelete = participants.find(p => p.tempId === tempId);
+    if (!participantToDelete || !participantToDelete.id) {
+      return;
     }
+
+    const endpoint = participantToDelete.type === 'player'
+      ? `encounters/player_data/${participantToDelete.id}/`
+      : `encounters/monster_data/${participantToDelete.id}/`;
+
+    try {
+      await API.delete(endpoint);
+      setParticipants(prevParticipants => prevParticipants.filter(p => p.tempId !== tempId));
+    } catch (err) {
+      console.error("Failed to delete participant:", err);
+    }
+  };
+
+  const handleAddPlayer = () => {
+    const newPlayer = {
+      type: "player",
+      display_name: "New Player",
+      initiative: null,
+      current_hp: null,
+      ac: null,
+      notes: "",
+      tempId: `new-player-${Date.now()}`,
+    };
+    setParticipants((prev) => [...prev, newPlayer]);
+  };
+
+  const handleAddMonster = () => {
+    const newMonster = {
+      type: "monster",
+      display_name: "New Monster",
+      initiative: null,
+      current_hp: null,
+      ac: null,
+      notes: "",
+      tempId: `new-monster-${Date.now()}`,
+    };
+    setParticipants((prev) => [...prev, newMonster]);
   };
 
   const handleSaveEncounter = async () => {
@@ -206,17 +253,15 @@ export default function EncounterView() {
         }));
 
       const payload = {
-        name: encounter.name,
-        description: encounter.description,
-        player_data: playerPayload,
-        monster_data: monsterPayload,
+          name: editableName,
+          description: encounter.description,
+          player_data: playerPayload,
+          monster_data: monsterPayload,
       };
 
       await API.put(`encounters/${id}/`, payload);
-      alert("Encounter saved successfully!");
     } catch (err) {
       setError(err.response?.data?.detail || err.message);
-      alert(`Failed to save encounter: ${err.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -231,28 +276,52 @@ export default function EncounterView() {
   if (!encounter) return <p className="p-6 text-gray-700">Encounter not found.</p>;
 
   return (
-    <div className="p-6 bg-white min-h-screen">
+    <div className="p-6 bg-green-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => navigate(-1)} variant="outline">
+        <Button onClick={() => navigate(-1)} variant="outline" className="bg-green-100 text-green-700 hover:bg-green-200">
           &larr; Back
         </Button>
         <div className="text-center flex-grow">
-          <h1 className="text-2xl font-bold text-gray-800">{encounter.name}</h1>
-          <p className="text-gray-500 text-sm">{encounter.description}</p>
+          <Input
+            type="text"
+            value={editableName}
+            onChange={handleNameChange}
+            className="text-2xl font-bold text-center text-green-700 mb-1 border-none bg-transparent focus-visible:ring-0"
+          />
+          <p className="text-green-600 text-sm">{encounter.description}</p>
         </div>
-        <Button onClick={handleSaveEncounter} disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save Encounter"}
-        </Button>
+        <div className="flex gap-2">
+            <Button
+              onClick={handleAddPlayer}
+              variant="outline"
+              className="bg-green-600 hover:bg-green-500 text-white"
+            >
+              Add Player
+            </Button>
+            <Button
+              onClick={handleAddMonster}
+              variant="outline"
+              className="bg-green-600 hover:bg-green-500 text-white"
+            >
+              Add Monster
+            </Button>
+            <Button
+              onClick={handleSaveEncounter}
+              disabled={isSaving}
+              className="bg-green-700 hover:bg-green-600 text-white"
+            >
+              {isSaving ? "Saving..." : "Save Encounter"}
+            </Button>
+        </div>
       </div>
 
-      <div className="rounded-md border border-gray-200">
-        <div className="hidden md:grid grid-cols-[1fr,2fr,2fr,1fr,2fr,auto] gap-2 p-2 bg-gray-100 font-semibold text-gray-700">
+      <div className="rounded-md border border-green-200">
+        <div className="hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 bg-green-100 font-semibold text-green-700">
           <div>Initiative</div>
-          <div>Name</div>
-          <div>Current HP</div>
+          <div className="col-span-1">Name</div>
+          <div>HP</div>
           <div>AC</div>
           <div>Notes</div>
-          <div>Actions</div>
         </div>
         {sortedParticipants.map((p) => (
           <ParticipantRow
@@ -260,7 +329,7 @@ export default function EncounterView() {
             participant={p}
             onUpdate={handleUpdateParticipant}
             onDamage={handleDamage}
-            onDetails={handleDetailsClick}
+            onDelete={handleDeleteParticipant}
           />
         ))}
       </div>

@@ -62,7 +62,7 @@ export const login = async (username, password) => {
 };
 
 export const register = async (username, password) => {
-  const response = await API.post("users/", { username, password });
+  const response = await API.post("register/", { username, password });
   return response.data;
 };
 

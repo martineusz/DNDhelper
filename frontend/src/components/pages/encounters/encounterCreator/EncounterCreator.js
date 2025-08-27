@@ -186,7 +186,7 @@ function EncounterSummary({
             <Badge variant={difficulty.variant} className={`font-bold ${difficulty.color}`}>{difficulty.text}</Badge>
           </div>
         </div>
-        <Button onClick={onSave} disabled={isSaving} className="w-full bg-green-700 hover:bg-green-600">
+        <Button onClick={onSave} disabled={isSaving} className="w-full bg-green-700 hover:bg-green-600 text-white">
           {isSaving ? "Saving..." : "Save Encounter"}
         </Button>
       </CardContent>
@@ -403,7 +403,7 @@ export default function EncounterCreator() {
         <div className="p-6 bg-gray-50 min-h-screen">
             <Input
                 type="text"
-                className="w-full text-center text-3xl font-bold bg-transparent border-none focus:outline-none focus-visible:ring-0 mb-6"
+                className="w-full text-center text-5xl font-extrabold bg-transparent border-none focus:outline-none focus-visible:ring-0 mb-6 text-green-900"
                 placeholder="Encounter Name"
                 value={encounterName}
                 onChange={(e) => setEncounterName(e.target.value)}
