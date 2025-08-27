@@ -1,13 +1,200 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import Select from "react-select";
-import PlayerRow from "./PlayerRow";
-import MonsterRow from "./MonsterRow";
-import EncounterSummary from "./EncounterSummary";
 import {useEncounterData} from "./hooks/useEncounterData";
 import {calculateMonsterXp, calculatePartyXpThresholds} from "./utils/EncounterCalculations";
-import "./EncounterCreator.css";
+import {Input} from "../../../ui/input";
+import {Button} from "../../../ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../../ui/card";
+import {Label} from "../../../ui/label";
+import {Badge} from "../../../ui/badge";
 
+// MonsterRow component refactored to use shadcn/ui
+function MonsterRow({ monster, onUpdate, onDelete }) {
+  const handleStatChange = (e) => {
+    const { name, value } = e.target;
+    onUpdate({
+      ...monster,
+      [name]: name === 'cr' ? value : Number(value) || value,
+    });
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    onUpdate({
+      ...monster,
+      name: value,
+    });
+  };
+
+  return (
+    <Card className="p-4 mb-2 shadow-sm bg-gray-50 border-gray-200">
+      <div className="flex justify-between items-center mb-2">
+        <Input
+          type="text"
+          name="name"
+          value={monster.name || ''}
+          onChange={handleNameChange}
+          className="font-bold text-lg border-none bg-transparent p-0 focus-visible:ring-0"
+        />
+        <Button variant="ghost" size="sm" onClick={() => onDelete(monster.id)} className="text-red-500 hover:bg-red-50 hover:text-red-700">
+          Delete
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+        <div className="flex flex-col">
+          <Label className="text-xs text-gray-500">CR</Label>
+          <Input type="text" name="cr" value={monster.cr || ''} onChange={handleStatChange} className="bg-gray-100 border-gray-200" />
+        </div>
+        <div className="flex flex-col">
+          <Label className="text-xs text-gray-500">HP</Label>
+          <Input type="number" name="current_hp" value={monster.current_hp || ''} onChange={handleStatChange} className="bg-gray-100 border-gray-200" />
+        </div>
+        <div className="flex flex-col">
+          <Label className="text-xs text-gray-500">AC</Label>
+          <Input type="number" name="ac" value={monster.ac || ''} onChange={handleStatChange} className="bg-gray-100 border-gray-200" />
+        </div>
+      </div>
+      {monster.url && (
+        <a href={monster.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">
+          Details
+        </a>
+      )}
+    </Card>
+  );
+}
+
+// PlayerRow component refactored to use shadcn/ui
+function PlayerRow({ player, onUpdate, onDelete }) {
+  const handleStatChange = (e) => {
+    const { name, value } = e.target;
+    onUpdate({
+      ...player,
+      [name]: Number(value) || value,
+    });
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    onUpdate({
+      ...player,
+      name: value,
+    });
+  };
+
+  const nameToDisplay = player.character_name || player.name || "Unnamed Character";
+
+  return (
+    <Card className="p-4 mb-2 shadow-sm bg-gray-50 border-gray-200">
+      <div className="flex justify-between items-center mb-2">
+        <Input
+          type="text"
+          value={nameToDisplay}
+          onChange={handleNameChange}
+          className="font-bold text-lg border-none bg-transparent p-0 focus-visible:ring-0"
+        />
+        <Button variant="ghost" size="sm" onClick={() => onDelete(player.id)} className="text-red-500 hover:bg-red-50 hover:text-red-700">
+          Delete
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+        <div className="flex flex-col">
+          <Label className="text-xs text-gray-500">Level</Label>
+          <Input type="number" name="character_level" value={player.character_level || ''} onChange={handleStatChange} className="bg-gray-100 border-gray-200" />
+        </div>
+        <div className="flex flex-col">
+          <Label className="text-xs text-gray-500">HP</Label>
+          <Input type="number" name="current_hp" value={player.current_hp || ''} onChange={handleStatChange} className="bg-gray-100 border-gray-200" />
+        </div>
+        <div className="flex flex-col">
+          <Label className="text-xs text-gray-500">AC</Label>
+          <Input type="number" name="ac" value={player.ac || ''} onChange={handleStatChange} className="bg-gray-100 border-gray-200" />
+        </div>
+      </div>
+      {player.url && (
+        <a href={player.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">
+          Details
+        </a>
+      )}
+    </Card>
+  );
+}
+
+// EncounterSummary component refactored to use shadcn/ui
+function EncounterSummary({
+  totalPlayers,
+  totalMonsters,
+  totalMonsterXp,
+  xpThresholds,
+  onSave,
+  isSaving
+}) {
+  const getDifficultyBadge = () => {
+    if (totalMonsterXp < xpThresholds.easy) return { text: "Trivial", variant: "outline", color: "text-gray-500" };
+    if (totalMonsterXp < xpThresholds.medium) return { text: "Easy", variant: "secondary", color: "text-green-600" };
+    if (totalMonsterXp < xpThresholds.hard) return { text: "Medium", variant: "default", color: "text-yellow-600" };
+    if (totalMonsterXp < xpThresholds.deadly) return { text: "Hard", variant: "destructive", color: "text-orange-600" };
+    return { text: "Deadly", variant: "destructive", color: "text-red-600" };
+  };
+
+  const difficulty = getDifficultyBadge();
+
+  return (
+    <Card className="flex-1 w-full p-6 bg-green-50 border-green-200 shadow-md">
+      <CardHeader className="p-0 mb-4">
+        <CardTitle className="text-xl font-bold text-green-700">Encounter Summary</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0 space-y-4">
+        <div className="space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold text-gray-700">Total Players:</span>
+            <Badge variant="secondary">{totalPlayers}</Badge>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-semibold text-gray-700">Total Monsters:</span>
+            <Badge variant="secondary">{totalMonsters}</Badge>
+          </div>
+        </div>
+        <hr className="border-green-300" />
+        <div className="space-y-1">
+          <h3 className="text-md font-semibold text-green-700">Party XP Thresholds</h3>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Easy:</span>
+            <span className="text-sm font-medium text-gray-800">{xpThresholds.easy} XP</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Medium:</span>
+            <span className="text-sm font-medium text-gray-800">{xpThresholds.medium} XP</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Hard:</span>
+            <span className="text-sm font-medium text-gray-800">{xpThresholds.hard} XP</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Deadly:</span>
+            <span className="text-sm font-medium text-gray-800">{xpThresholds.deadly} XP</span>
+          </div>
+        </div>
+        <hr className="border-green-300" />
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold text-green-700">Total Monster XP:</span>
+            <Badge variant="secondary" className="font-medium">{totalMonsterXp} XP</Badge>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-semibold text-green-700">Difficulty:</span>
+            <Badge variant={difficulty.variant} className={`font-bold ${difficulty.color}`}>{difficulty.text}</Badge>
+          </div>
+        </div>
+        <Button onClick={onSave} disabled={isSaving} className="w-full bg-green-700 hover:bg-green-600">
+          {isSaving ? "Saving..." : "Save Encounter"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Main component
 export default function EncounterCreator() {
     const {availablePlayers, availableMonsters, loading, error, refreshData} = useEncounterData();
     const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -15,15 +202,12 @@ export default function EncounterCreator() {
     const [customPlayerName, setCustomPlayerName] = useState("");
     const [customMonsterName, setCustomMonsterName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
-    // State for the user-defined encounter name
     const [encounterName, setEncounterName] = useState("Encounter Name");
 
     const navigate = useNavigate();
 
     const handleAddCustomPlayer = () => {
         if (!customPlayerName) return;
-
-        // Create a temporary object with a unique negative ID to distinguish from database IDs
         const newPlayer = {
             id: -(new Date().getTime()),
             name: customPlayerName,
@@ -31,15 +215,12 @@ export default function EncounterCreator() {
             current_hp: 0,
             notes: "",
         };
-
         setSelectedPlayers([...selectedPlayers, newPlayer]);
         setCustomPlayerName("");
     };
 
     const handleAddCustomMonster = () => {
         if (!customMonsterName) return;
-
-        // Create a temporary object with a unique negative ID
         const newMonster = {
             id: -(new Date().getTime()),
             name: customMonsterName,
@@ -50,7 +231,6 @@ export default function EncounterCreator() {
             cr: "0",
             xp: 0,
         };
-
         setSelectedMonsters([...selectedMonsters, newMonster]);
         setCustomMonsterName("");
     };
@@ -120,22 +300,19 @@ export default function EncounterCreator() {
 
         try {
             const playerPayload = selectedPlayers.map(player => {
-                // For both custom and existing players, use the 'name' field
-                // if it exists, otherwise use 'character_name' or a default
                 const playerName = player.name || player.character_name || "Unnamed Character";
-
-                if (player.id > 0) { // Existing player
+                if (player.id > 0) {
                     return {
                         player_character: player.id,
-                        name: playerName, // Corrected line: Add the name
+                        name: playerName,
                         initiative: player.initiative,
                         current_hp: player.current_hp,
                         notes: player.notes,
                         ac: player.ac,
                     };
-                } else { // Custom player
+                } else {
                     return {
-                        name: playerName, // Corrected line: Use the determined name
+                        name: playerName,
                         player_character: null,
                         initiative: player.initiative,
                         current_hp: player.current_hp,
@@ -146,21 +323,19 @@ export default function EncounterCreator() {
             });
 
             const monsterPayload = selectedMonsters.map(monster => {
-                // For both custom and existing monsters, use the 'name' field
                 const monsterName = monster.name || "Unnamed Monster";
-
-                if (monster.id > 0) { // Existing monster
+                if (monster.id > 0) {
                     return {
                         monster: monster.id,
-                        name: monsterName, // Corrected line: Add the name
+                        name: monsterName,
                         initiative: monster.initiative,
                         current_hp: monster.current_hp,
                         notes: monster.notes,
                         ac: monster.ac,
                     };
-                } else { // Custom monster
+                } else {
                     return {
-                        name: monsterName, // Corrected line: Use the determined name
+                        name: monsterName,
                         monster: null,
                         initiative: monster.initiative,
                         current_hp: monster.current_hp,
@@ -194,10 +369,8 @@ export default function EncounterCreator() {
                     throw new Error(`Failed to save encounter: ${response.status} ${response.statusText} - ${errorText}`);
                 }
             }
-
             const newEncounter = await response.json();
             console.log("Saved Encounter:", newEncounter);
-
         } catch (error) {
             console.error("Failed to save encounter:", error);
             alert(`Failed to save encounter: ${error.message}`);
@@ -223,65 +396,34 @@ export default function EncounterCreator() {
             label: monster.name,
         }));
 
-    if (loading) return <p>Loading data...</p>;
-    if (error) return <p style={{color: "red"}}>Error: {error}</p>;
+    if (loading) return <p className="p-6 text-gray-700">Loading data...</p>;
+    if (error) return <p className="p-6 text-red-500 font-bold">Error: {error}</p>;
 
     return (
-        <div className="encounter-creator-container">
-            {/* Input field for the encounter name without full width */}
-            <input
+        <div className="p-6 bg-gray-50 min-h-screen">
+            <Input
                 type="text"
-                className="encounter-name-input"
+                className="w-full text-center text-3xl font-bold bg-transparent border-none focus:outline-none focus-visible:ring-0 mb-6"
                 placeholder="Encounter Name"
                 value={encounterName}
                 onChange={(e) => setEncounterName(e.target.value)}
-                style={{
-                    fontSize: "2rem",
-                    padding: "15px",
-                    boxSizing: "border-box",
-                    marginBottom: "20px",
-                    textAlign: "center"
-                }}
             />
 
-            <div style={{
-                display: "flex",
-                gap: "40px",
-                marginTop: "20px",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-            }}>
-                {/* Left Panel: Players */}
-                <div style={{flex: "1 1 300px", minWidth: 0}}>
-                    <h2>Player Characters</h2>
-                    <hr/>
-                    <div style={{display: "flex", alignItems: "center", marginBottom: "10px", marginTop: "10px"}}>
-                        <input
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Players Panel */}
+                <div className="space-y-4">
+                    <h2 className="text-xl font-semibold text-gray-700">Player Characters</h2>
+                    <div className="flex space-x-2">
+                        <Input
                             type="text"
                             placeholder="Custom character name"
                             value={customPlayerName}
                             onChange={(e) => setCustomPlayerName(e.target.value)}
-                            style={{
-                                flexGrow: 1,
-                                padding: "8px",
-                                border: "1px solid #ccc",
-                                borderRadius: "4px 0 0 4px",
-                            }}
+                            className="flex-grow"
                         />
-                        <button
-                            onClick={handleAddCustomPlayer}
-                            disabled={isSaving}
-                            style={{
-                                padding: "8px 12px",
-                                backgroundColor: "#f0f0f0",
-                                border: "1px solid #ccc",
-                                borderLeft: "none",
-                                borderRadius: "0 4px 4px 0",
-                                cursor: "pointer",
-                            }}
-                        >
-                            {isSaving ? "Adding..." : "Add"}
-                        </button>
+                        <Button onClick={handleAddCustomPlayer} disabled={isSaving} variant="outline">
+                            Add
+                        </Button>
                     </div>
                     <Select
                         options={playerOptions}
@@ -289,55 +431,28 @@ export default function EncounterCreator() {
                         placeholder="Search and add a character..."
                         value={null}
                         isClearable={true}
-                        styles={{
-                            container: (provided) => ({
-                                ...provided,
-                                marginBottom: "20px",
-                            }),
-                        }}
                     />
-                    <div className="scrollable-list">
-                        {selectedPlayers.length > 0 && (
-                            <div>
-                                {selectedPlayers.map((player) => (
-                                    <PlayerRow key={player.id} player={player} onUpdate={handlePlayerUpdate}
-                                               onDelete={handlePlayerDelete}/>
-                                ))}
-                            </div>
-                        )}
+                    <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                        {selectedPlayers.map((player) => (
+                            <PlayerRow key={player.id} player={player} onUpdate={handlePlayerUpdate} onDelete={handlePlayerDelete} />
+                        ))}
                     </div>
                 </div>
 
-                <div style={{flex: "1 1 300px", minWidth: 0}}>
-                    <h2>Enemies</h2>
-                    <hr/>
-                    <div style={{display: "flex", alignItems: "center", marginBottom: "10px", marginTop: "10px"}}>
-                        <input
+                {/* Monsters Panel */}
+                <div className="space-y-4">
+                    <h2 className="text-xl font-semibold text-gray-700">Enemies</h2>
+                    <div className="flex space-x-2">
+                        <Input
                             type="text"
                             placeholder="Custom monster name"
                             value={customMonsterName}
                             onChange={(e) => setCustomMonsterName(e.target.value)}
-                            style={{
-                                flexGrow: 1,
-                                padding: "8px",
-                                border: "1px solid #ccc",
-                                borderRadius: "4px 0 0 4px",
-                            }}
+                            className="flex-grow"
                         />
-                        <button
-                            onClick={handleAddCustomMonster}
-                            disabled={isSaving}
-                            style={{
-                                padding: "8px 12px",
-                                backgroundColor: "#f0f0f0",
-                                border: "1px solid #ccc",
-                                borderLeft: "none",
-                                borderRadius: "0 4px 4px 0",
-                                cursor: "pointer",
-                            }}
-                        >
-                            {isSaving ? "Adding..." : "Add"}
-                        </button>
+                        <Button onClick={handleAddCustomMonster} disabled={isSaving} variant="outline">
+                            Add
+                        </Button>
                     </div>
                     <Select
                         options={monsterOptions}
@@ -345,25 +460,15 @@ export default function EncounterCreator() {
                         placeholder="Search and add an enemy..."
                         value={null}
                         isClearable={true}
-                        styles={{
-                            container: (provided) => ({
-                                ...provided,
-                                marginBottom: "20px",
-                            }),
-                        }}
                     />
-                    <div className="scrollable-list">
-                        {selectedMonsters.length > 0 && (
-                            <div>
-                                {selectedMonsters.map((monster) => (
-                                    <MonsterRow key={monster.id} monster={monster} onUpdate={handleMonsterUpdate}
-                                                onDelete={handleMonsterDelete}/>
-                                ))}
-                            </div>
-                        )}
+                    <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                        {selectedMonsters.map((monster) => (
+                            <MonsterRow key={monster.id} monster={monster} onUpdate={handleMonsterUpdate} onDelete={handleMonsterDelete} />
+                        ))}
                     </div>
                 </div>
 
+                {/* Encounter Summary Panel */}
                 <EncounterSummary
                     totalPlayers={selectedPlayers.length}
                     totalMonsters={selectedMonsters.length}

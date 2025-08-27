@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./QuickEncounter.css";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 
 export default function QuickEncounter() {
   const [participants, setParticipants] = useState([
@@ -13,7 +14,6 @@ export default function QuickEncounter() {
     },
   ]);
 
-  // A function to handle adding a new participant
   const handleAddParticipant = () => {
     const newParticipant = {
       id: Date.now(),
@@ -26,14 +26,12 @@ export default function QuickEncounter() {
     setParticipants([...participants, newParticipant]);
   };
 
-  // A function to handle deleting a participant
   const handleDeleteParticipant = (id) => {
     setParticipants((prevParticipants) =>
       prevParticipants.filter((p) => p.id !== id)
     );
   };
 
-  // A function to handle changes in the input fields
   const handleParticipantChange = (id, field, value) => {
     setParticipants((prevParticipants) =>
       prevParticipants.map((p) =>
@@ -42,7 +40,6 @@ export default function QuickEncounter() {
     );
   };
 
-  // A function to handle damage subtraction
   const handleSubtractDamage = (id) => {
     setParticipants((prevParticipants) =>
       prevParticipants.map((p) => {
@@ -51,33 +48,34 @@ export default function QuickEncounter() {
             0,
             (parseInt(p.currentHp, 10) || 0) - (parseInt(p.damageTaken, 10) || 0)
           );
-          return { ...p, currentHp: newHp, damageTaken: "" }; // Reset damageTaken after subtraction
+          return { ...p, currentHp: newHp, damageTaken: "" };
         }
         return p;
       })
     );
   };
 
-  // Auto-sort participants whenever the list changes
   const sortedParticipants = [...participants].sort((a, b) => {
     return (b.initiative || 0) - (a.initiative || 0);
   });
 
   return (
-    <div className="quick-encounter-container">
-      <h2>Quick Encounter</h2>
+    <div className="p-6 bg-white h-screen overflow-y-auto">
+      <h1 className="text-2xl font-semibold text-green-700 mb-6">
+        Quick Encounter
+      </h1>
 
-      <div className="encounter-grid">
-        <div className="grid-header">
-          <div className="grid-column">Initiative</div>
-          <div className="grid-column">Name</div>
-          <div className="grid-column">Current HP</div>
-          <div className="grid-column">Tags</div>
-          <div className="grid-column"></div> {/* Empty column for delete button */}
+      <div className="rounded-md border border-green-200">
+        <div className="grid grid-cols-[1fr,2fr,2fr,2fr,auto] gap-2 p-2 bg-green-100 font-semibold text-green-700">
+          <div>Init</div>
+          <div>Name</div>
+          <div>HP</div>
+          <div>Tags</div>
+          <div></div>
         </div>
-        {sortedParticipants.map((participant) => (
-          <div key={participant.id} className="grid-row">
-            <input
+        {sortedParticipants.map((participant, index) => (
+          <div key={participant.id} className="grid grid-cols-[1fr,2fr,2fr,2fr,auto] gap-2 p-2 items-center border-b border-green-100 last:border-b-0">
+            <Input
               type="number"
               value={participant.initiative}
               placeholder="0"
@@ -88,17 +86,19 @@ export default function QuickEncounter() {
                   e.target.value
                 )
               }
+              className="bg-green-50 border-green-200 text-green-700"
             />
-            <input
+            <Input
               type="text"
               value={participant.name}
-              placeholder="Character/Monster"
+              placeholder="Character"
               onChange={(e) =>
                 handleParticipantChange(participant.id, "name", e.target.value)
               }
+              className="bg-green-50 border-green-200 text-green-700"
             />
-            <div className="hp-section">
-              <input
+            <div className="flex items-center gap-2">
+              <Input
                 type="number"
                 value={participant.currentHp}
                 placeholder="HP"
@@ -109,9 +109,10 @@ export default function QuickEncounter() {
                     e.target.value
                   )
                 }
+                className="bg-green-50 border-green-200 text-green-700 w-20"
               />
-              <div className="damage-input-group">
-                <input
+              <div className="flex flex-grow items-center">
+                <Input
                   type="number"
                   value={participant.damageTaken}
                   placeholder="Damage"
@@ -122,35 +123,44 @@ export default function QuickEncounter() {
                       e.target.value
                     )
                   }
+                  className="bg-green-50 border-green-200 text-green-700 w-full"
                 />
-                <button
-                  className="damage-button"
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="ml-1 shrink-0 bg-green-700 text-white hover:bg-green-600 border-green-800"
                   onClick={() => handleSubtractDamage(participant.id)}
                 >
-                  - HP
-                </button>
+                  -
+                </Button>
               </div>
             </div>
-            <input
+            <Input
               type="text"
               value={participant.tags}
-              placeholder="Condition, Status..."
+              placeholder="Conditions"
               onChange={(e) =>
                 handleParticipantChange(participant.id, "tags", e.target.value)
               }
+              className="bg-green-50 border-green-200 text-green-700"
             />
-            <button
-              className="delete-button"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-500 hover:text-red-700"
               onClick={() => handleDeleteParticipant(participant.id)}
             >
               &times;
-            </button>
+            </Button>
           </div>
         ))}
       </div>
-      <button className="add-button" onClick={handleAddParticipant}>
-        Add
-      </button>
+      <Button
+        className="mt-4 w-full bg-green-700 text-white hover:bg-green-600"
+        onClick={handleAddParticipant}
+      >
+        Add Participant
+      </Button>
     </div>
   );
 }

@@ -1,32 +1,45 @@
-// Dashboard.js
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
-import "./Dashboard.css";
+import { Button } from "../ui/button";
 
 export default function Dashboard() {
   return (
-    <div className="dashboard-container">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Top panel */}
-      <header className="top-panel">
-        <div className="top-left">DnDHelper</div>
-        {/* Menu buttons now in the top-panel */}
-        <nav className="menu-buttons">
-            <Link to="/dashboard/quick" className="menu-button">Quick Combat</Link>
-            <Link to="/dashboard/encounter-creator" className="menu-button">New Encounter</Link>
-            <Link to="/dashboard/encounters" className="menu-button">My Encounters</Link>
-            {/* <Link to="/dashboard/campaigns" className="menu-button">Campaigns</Link> */}
-            <Link to="/dashboard/players" className="menu-button">Players</Link>
-            <Link to="/dashboard/monsters" className="menu-button">Monsters</Link>
-            <Link to="/dashboard/spells" className="menu-button">Spells</Link>
+      <header className="flex items-center justify-between p-4 bg-white shadow-md">
+        <div className="text-xl font-bold text-gray-800">DnDHelper</div>
+        {/* Menu buttons */}
+        <nav className="flex space-x-2">
+            <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/quick">Quick Combat</Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/encounter-creator">New Encounter</Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/encounters">My Encounters</Link>
+            </Button>
+            {/* <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/campaigns">Campaigns</Link>
+            </Button> */}
+            <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/players">Players</Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/monsters">Monsters</Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-gray-700 hover:bg-gray-200">
+                <Link to="/dashboard/spells">Spells</Link>
+            </Button>
         </nav>
-        <div className="top-right">
-          <button className="top-button">User</button>
+        <div className="flex items-center">
+          <Button variant="outline" className="text-gray-700">User</Button>
         </div>
       </header>
 
       {/* Main content */}
-      <div className="main-content">
-        <main className="center-panel">
+      <div className="flex-grow p-6 overflow-auto">
+        <main className="mx-auto max-w-7xl">
           <Outlet />
         </main>
       </div>

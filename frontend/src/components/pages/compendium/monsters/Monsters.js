@@ -1,4 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { Input } from "../../../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../ui/table";
 
 export default function Monsters() {
   const [monsters, setMonsters] = useState([]);
@@ -49,74 +65,100 @@ export default function Monsters() {
   }, [search, typeFilter, sortBy, monsters]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Monster Browser</h1>
+    <div className="p-6 bg-white h-screen overflow-y-auto">
+      <h1 className="text-2xl font-semibold text-green-700 mb-6">
+        Monster Browser
+      </h1>
 
       {/* Controls */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search monsters..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border rounded px-3 py-2 w-64"
-        />
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="all">All Types</option>
-          <option value="beast">Beast</option>
-          <option value="undead">Undead</option>
-          <option value="dragon">Dragon</option>
-          <option value="fiend">Fiend</option>
-        </select>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="name">Name</option>
-          <option value="cr">Challenge Rating</option>
-          <option value="ac">Armor Class</option>
-          <option value="hp">Hit Points</option>
-        </select>
+      <div className="flex flex-wrap items-end gap-4 mb-6">
+        <div className="flex flex-col">
+          <label htmlFor="search" className="text-sm text-green-600 mb-1">
+            Search
+          </label>
+          <Input
+            id="search"
+            type="text"
+            placeholder="Search monsters..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-64 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="type-filter" className="text-sm text-green-600 mb-1">
+            Type
+          </label>
+          <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value)}>
+            <SelectTrigger
+              id="type-filter"
+              className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300"
+            >
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="beast">Beast</SelectItem>
+              <SelectItem value="undead">Undead</SelectItem>
+              <SelectItem value="dragon">Dragon</SelectItem>
+              <SelectItem value="fiend">Fiend</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="sort-by" className="text-sm text-green-600 mb-1">
+            Sort By
+          </label>
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
+            <SelectTrigger
+              id="sort-by"
+              className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300"
+            >
+              <SelectValue placeholder="Name" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="cr">Challenge Rating</SelectItem>
+              <SelectItem value="ac">Armor Class</SelectItem>
+              <SelectItem value="hp">Hit Points</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Monster table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300 rounded">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border px-4 py-2 text-left">Name</th>
-              <th className="border px-4 py-2 text-left">Type</th>
-              <th className="border px-4 py-2 text-left">CR</th>
-              <th className="border px-4 py-2 text-left">AC</th>
-              <th className="border px-4 py-2 text-left">HP</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="overflow-x-auto rounded-md border border-green-200">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-green-100 hover:bg-green-100">
+              <TableHead className="text-green-700">Name</TableHead>
+              <TableHead className="text-green-700">Type</TableHead>
+              <TableHead className="text-green-700">CR</TableHead>
+              <TableHead className="text-green-700">AC</TableHead>
+              <TableHead className="text-green-700">HP</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filtered.map((monster) => (
-              <tr key={monster.id} className="hover:bg-gray-50">
-                <td className="border px-4 py-2">
+              <TableRow key={monster.id} className="hover:bg-green-50">
+                <TableCell>
                   <a
                     href={monster.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-green-600 hover:underline"
                   >
                     {monster.name}
                   </a>
-                </td>
-                <td className="border px-4 py-2">{monster.type}</td>
-                <td className="border px-4 py-2">{monster.cr}</td>
-                <td className="border px-4 py-2">{monster.ac}</td>
-                <td className="border px-4 py-2">{monster.hp}</td>
-              </tr>
+                </TableCell>
+                <TableCell>{monster.type}</TableCell>
+                <TableCell>{monster.cr}</TableCell>
+                <TableCell>{monster.ac}</TableCell>
+                <TableCell>{monster.hp}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
