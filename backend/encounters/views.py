@@ -3,9 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Encounter
-from .serializers import EncounterSerializer
-
+from .models import Encounter, PlayerEncounterData, MonsterEncounterData
+from .serializers import EncounterSerializer, PlayerEncounterDataSerializer, MonsterEncounterDataSerializer
 
 class EncounterViewSet(viewsets.ModelViewSet):
     queryset = Encounter.objects.prefetch_related(
@@ -13,18 +12,31 @@ class EncounterViewSet(viewsets.ModelViewSet):
         'monster_data__monster'
     ).all()
     serializer_class = EncounterSerializer
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated]
 
-    
-    
     @action(detail=False, methods=['get'])
     def my_encounters(self, request):
-        
         user_encounters = self.queryset.filter(user=request.user)
         serializer = self.get_serializer(user_encounters, many=True)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        
-        
         serializer.save(user=self.request.user)
+
+
+class PlayerEncounterDataViewSet(viewsets.ModelViewSet):
+    queryset = PlayerEncounterData.objects.all()
+    serializer_class = PlayerEncounterDataSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(encounter__user=self.request.user)
+
+
+class MonsterEncounterDataViewSet(viewsets.ModelViewSet):
+    queryset = MonsterEncounterData.objects.all()
+    serializer_class = MonsterEncounterDataSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(encounter__user=self.request.user)

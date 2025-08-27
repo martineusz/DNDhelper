@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -16,19 +17,23 @@ import Spells from "./components/pages/compendium/spells/Spells";
 import SpellPage from "./components/pages/compendium/spells/SpellPage";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("access_token") // keep login on refresh
+  );
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Public pages */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
 
         {/* Protected dashboard pages */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Dashboard setIsLoggedIn={setIsLoggedIn} />
             </ProtectedRoute>
           }
         >

@@ -16,12 +16,14 @@ function EncounterCard({ encounter, onCardClick }) {
     .slice(0, 3)
     .map((p) => (p.player_character ? p.player_character.character_name : p.name));
   const playerNamesString = playerNames.join(", ");
+  const playerCount = encounter.player_data.length;
 
   // Extract the first three monster names
   const monsterNames = encounter.monster_data
     .slice(0, 3)
     .map((m) => (m.monster ? m.monster.name : m.name));
   const monsterNamesString = monsterNames.join(", ");
+  const monsterCount = encounter.monster_data.length;
 
   return (
     <Card
@@ -39,11 +41,11 @@ function EncounterCard({ encounter, onCardClick }) {
       <CardContent>
         <p>
           <strong className="text-green-600">Players:</strong>{" "}
-          {encounter.player_data.length} ({playerNamesString})
+          {playerCount > 0 ? `${playerCount} (${playerNamesString})` : playerCount}
         </p>
         <p>
           <strong className="text-green-600">Monsters:</strong>{" "}
-          {encounter.monster_data.length} ({monsterNamesString})
+          {monsterCount > 0 ? `${monsterCount} (${monsterNamesString})` : monsterCount}
         </p>
       </CardContent>
     </Card>

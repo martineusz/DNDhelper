@@ -95,16 +95,16 @@ export default function Spells() {
             <SelectTrigger id="school-filter" className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300">
               <SelectValue placeholder="All Schools" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Schools</SelectItem>
-              <SelectItem value="abjuration">Abjuration</SelectItem>
-              <SelectItem value="conjuration">Conjuration</SelectItem>
-              <SelectItem value="divination">Divination</SelectItem>
-              <SelectItem value="enchantment">Enchantment</SelectItem>
-              <SelectItem value="evocation">Evocation</SelectItem>
-              <SelectItem value="illusion">Illusion</SelectItem>
-              <SelectItem value="necromancy">Necromancy</SelectItem>
-              <SelectItem value="transmutation">Transmutation</SelectItem>
+            <SelectContent className="bg-white border-green-200 shadow-lg"> {/* Added classes for solid background and shadow */}
+              <SelectItem value="all" className="hover:bg-green-100 focus:bg-green-100">All Schools</SelectItem> {/* Added highlight classes */}
+              <SelectItem value="abjuration" className="hover:bg-green-100 focus:bg-green-100">Abjuration</SelectItem>
+              <SelectItem value="conjuration" className="hover:bg-green-100 focus:bg-green-100">Conjuration</SelectItem>
+              <SelectItem value="divination" className="hover:bg-green-100 focus:bg-green-100">Divination</SelectItem>
+              <SelectItem value="enchantment" className="hover:bg-green-100 focus:bg-green-100">Enchantment</SelectItem>
+              <SelectItem value="evocation" className="hover:bg-green-100 focus:bg-green-100">Evocation</SelectItem>
+              <SelectItem value="illusion" className="hover:bg-green-100 focus:bg-green-100">Illusion</SelectItem>
+              <SelectItem value="necromancy" className="hover:bg-green-100 focus:bg-green-100">Necromancy</SelectItem>
+              <SelectItem value="transmutation" className="hover:bg-green-100 focus:bg-green-100">Transmutation</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -119,9 +119,9 @@ export default function Spells() {
             <SelectTrigger id="sort-by" className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300">
               <SelectValue placeholder="Name" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="level">Level</SelectItem>
+            <SelectContent className="bg-white border-green-200 shadow-lg"> {/* Added classes for solid background and shadow */}
+              <SelectItem value="name" className="hover:bg-green-100 focus:bg-green-100">Name</SelectItem> {/* Added highlight classes */}
+              <SelectItem value="level" className="hover:bg-green-100 focus:bg-green-100">Level</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -154,7 +154,9 @@ export default function Spells() {
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {spell.classes.map((cls) => (
-                      <Badge key={cls} variant="secondary">{cls}</Badge>
+                      <span key={cls} className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> {/* Changed Badge to a styled span for "chips" */}
+                        {cls}
+                      </span>
                     ))}
                   </div>
                 </TableCell>
