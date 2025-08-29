@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db_prod
+    restart: always
+    env_file:
+      - backend/.env.prod
+    ports:
+      - "5433:5432"                 # Host port 5433 → container 5432
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - prodnet
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: dndhelper_prod-backend
+    env_file:
+      - backend/.env.prod
+    depends_on:
+      - db
+    ports:
+      - "8001:8000"                 # Host port 8001 → container 8000
+    networks:
+      - prodnet
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: dndhelper_prod-frontend
+    ports:
+      - "3001:80"                   # Host port 3001 → container 80
+    networks:
+      - prodnet
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  prodnet:
