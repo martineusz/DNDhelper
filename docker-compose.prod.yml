@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db_prod
+    restart: always
+    env_file:
+      - backend/.env.prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - prodnet
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dndhelper_prod-backend
+    env_file:
+      - backend/.env.prod
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    networks:
+      - prodnet
+    restart: always
+    volumes:
+      - C:/Users/mateu/PycharmProjects/DNDhelper/backend/resources:/app/resources
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dndhelper_prod-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - prodnet
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  prodnet:

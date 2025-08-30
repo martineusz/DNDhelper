@@ -135,7 +135,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-backend/.env
+db.env
 .envrc
 .venv
 env/
@@ -218,5 +218,9 @@ frontend/yarn-error.log
 frontend/package-lock.json
 frontend/yarn.lock
 
-#Exclude resources from build
-/resources/
+/db.env
+
+# Backend environment files
+/backend/.env
+/backend/.env.dev
+/backend/.env.prod
