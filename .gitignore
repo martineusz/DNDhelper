@@ -218,8 +218,6 @@ frontend/yarn-error.log
 frontend/package-lock.json
 frontend/yarn.lock
 
-#Exclude resources from build
-/resources/
 /db.env
 
 # Backend environment files
