@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../ui/card";
 import { Badge } from "../../../ui/badge";
 import { Separator } from "../../../ui/separator";
+import API from "../../../../api";
 
 export default function SpellPage() {
   const { slug } = useParams();
@@ -13,12 +14,11 @@ export default function SpellPage() {
   useEffect(() => {
     const fetchSpell = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/spells/${encodeURIComponent(slug)}/`);
-        if (!response.ok) throw new Error("Spell not found");
-        const data = await response.json();
-        setSpell(data);
+        const response = await API.get(`spells/${encodeURIComponent(slug)}/`);
+        setSpell(response.data);
       } catch (err) {
-        setError(err.message);
+        console.error("Error fetching spell:", err);
+        setError(err.response?.data?.detail || "Spell not found");
       } finally {
         setLoading(false);
       }

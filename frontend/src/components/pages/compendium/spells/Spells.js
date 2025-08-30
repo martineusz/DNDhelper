@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../ui/table";
-import { Badge } from "../../../ui/badge";
+import API from "../../../../api";
 
 export default function Spells() {
   const [spells, setSpells] = useState([]);
@@ -28,10 +28,9 @@ export default function Spells() {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/spells/");
-        const data = await response.json();
-        setSpells(data);
-        setFiltered(data);
+        const response = await API.get("spells/");
+        setSpells(response.data);
+        setFiltered(response.data);
       } catch (err) {
         console.error("Error fetching spells:", err);
       }
@@ -95,8 +94,8 @@ export default function Spells() {
             <SelectTrigger id="school-filter" className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300">
               <SelectValue placeholder="All Schools" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-green-200 shadow-lg"> {/* Added classes for solid background and shadow */}
-              <SelectItem value="all" className="hover:bg-green-100 focus:bg-green-100">All Schools</SelectItem> {/* Added highlight classes */}
+            <SelectContent className="bg-white border-green-200 shadow-lg">
+              <SelectItem value="all" className="hover:bg-green-100 focus:bg-green-100">All Schools</SelectItem>
               <SelectItem value="abjuration" className="hover:bg-green-100 focus:bg-green-100">Abjuration</SelectItem>
               <SelectItem value="conjuration" className="hover:bg-green-100 focus:bg-green-100">Conjuration</SelectItem>
               <SelectItem value="divination" className="hover:bg-green-100 focus:bg-green-100">Divination</SelectItem>
@@ -119,8 +118,8 @@ export default function Spells() {
             <SelectTrigger id="sort-by" className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300">
               <SelectValue placeholder="Name" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-green-200 shadow-lg"> {/* Added classes for solid background and shadow */}
-              <SelectItem value="name" className="hover:bg-green-100 focus:bg-green-100">Name</SelectItem> {/* Added highlight classes */}
+            <SelectContent className="bg-white border-green-200 shadow-lg">
+              <SelectItem value="name" className="hover:bg-green-100 focus:bg-green-100">Name</SelectItem>
               <SelectItem value="level" className="hover:bg-green-100 focus:bg-green-100">Level</SelectItem>
             </SelectContent>
           </Select>
@@ -154,7 +153,7 @@ export default function Spells() {
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {spell.classes.map((cls) => (
-                      <span key={cls} className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> {/* Changed Badge to a styled span for "chips" */}
+                      <span key={cls} className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                         {cls}
                       </span>
                     ))}

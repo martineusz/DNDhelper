@@ -16,7 +16,8 @@ else:
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: v.split(','))
+#ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: v.split(','))
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'player_characters',
