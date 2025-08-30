@@ -10,8 +10,11 @@ import {Label} from "../../../ui/label";
 import {Badge} from "../../../ui/badge";
 import API from "../../../../api";
 
+import knightIcon from "../../../../assets/knight-helmet.svg";
+import dragon1Icon from "../../../../assets/dragon1.svg";
+import signIcon from "../../../../assets/sign.svg";
 
-// MonsterRow component refactored to use shadcn/ui
+
 function MonsterRow({monster, onUpdate, onDelete}) {
     const handleStatChange = (e) => {
         const {name, value} = e.target;
@@ -157,17 +160,24 @@ function EncounterSummary({
 
     return (
         <Card className="flex-1 w-full p-6 bg-green-50 border-green-200 shadow-md">
-            <CardHeader className="p-0 mb-4">
+            <CardHeader className="p-0 mb-4 flex items-center space-x-2">
+                {signIcon && (
+                    <img
+                        src={signIcon}
+                        alt=""
+                        className="h-12 w-12 text-green-700 fill-current"
+                    />
+                )}
                 <CardTitle className="text-xl font-bold text-green-700">Encounter Summary</CardTitle>
             </CardHeader>
             <CardContent className="p-0 space-y-4">
                 <div className="space-y-1">
                     <div className="flex justify-between items-center">
-                        <span className="font-semibold text-gray-700">Total Players:</span>
+                        <span className="font-semibold text-gray-700 text-green-700">Total Players:</span>
                         <Badge variant="secondary">{totalPlayers}</Badge>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="font-semibold text-gray-700">Total Monsters:</span>
+                        <span className="font-semibold text-gray-700 text-green-700">Total Monsters:</span>
                         <Badge variant="secondary">{totalMonsters}</Badge>
                     </div>
                 </div>
@@ -204,7 +214,7 @@ function EncounterSummary({
                     </div>
                 </div>
                 <Button onClick={onSave} disabled={isSaving}
-                        className="w-full bg-green-700 hover:bg-green-600 text-white">
+                        className="w-full bg-green-600 hover:bg-green-500 text-white">
                     {isSaving ? "Saving..." : "Save Encounter"}
                 </Button>
             </CardContent>
@@ -396,7 +406,10 @@ export default function EncounterCreator() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Players Panel */}
                 <div className="space-y-4">
-                    <h2 className="text-xl font-semibold text-gray-700">Player Characters</h2>
+                    <h2 className="text-xl font-semibold text-gray-700 flex items-center space-x-2">
+                        <img src={knightIcon} alt="" className="h-6 w-6"/>
+                        <span>Allies</span>
+                    </h2>
                     <div className="flex space-x-2">
                         <Input
                             type="text"
@@ -412,7 +425,7 @@ export default function EncounterCreator() {
                     <Select
                         options={playerOptions}
                         onChange={handlePlayerSelect}
-                        placeholder="Search and add a character..."
+                        placeholder="Add existing character..."
                         value={null}
                         isClearable={true}
                     />
@@ -426,7 +439,10 @@ export default function EncounterCreator() {
 
                 {/* Monsters Panel */}
                 <div className="space-y-4">
-                    <h2 className="text-xl font-semibold text-gray-700">Enemies</h2>
+                    <h2 className="text-xl font-semibold text-gray-700 flex items-center space-x-2">
+                        <img src={dragon1Icon} alt="" className="h-6 w-6"/>
+                        <span>Enemies</span>
+                    </h2>
                     <div className="flex space-x-2">
                         <Input
                             type="text"
@@ -442,7 +458,7 @@ export default function EncounterCreator() {
                     <Select
                         options={monsterOptions}
                         onChange={handleMonsterSelect}
-                        placeholder="Search and add an enemy..."
+                        placeholder="Add existing an enemy..."
                         value={null}
                         isClearable={true}
                     />
@@ -462,6 +478,7 @@ export default function EncounterCreator() {
                     totalMonsterXp={totalMonsterXp}
                     onSave={handleSaveEncounter}
                     isSaving={isSaving}
+                    signIcon={signIcon}
                 />
             </div>
         </div>
