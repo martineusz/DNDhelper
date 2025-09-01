@@ -3,49 +3,57 @@ import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { Card } from "../../ui/card";
 import { Label } from "../../ui/label";
+import { useDarkMode } from "../../../context/DarkModeContext";
 
-// A component for a single participant row, handling its own state for damage input
-function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete }) {
+// Single participant row
+function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete, darkMode }) {
   const [damageTaken, setDamageTaken] = useState("");
 
-  const handleDamageChange = (e) => {
-    setDamageTaken(e.target.value);
-  };
-
+  const handleDamageChange = (e) => setDamageTaken(e.target.value);
   const handleSubtractDamage = () => {
     onDamage(participant.tempId, parseInt(damageTaken, 10) || 0);
     setDamageTaken("");
   };
+  const handleInputChange = (field) => (e) => onUpdate(participant.tempId, field, e.target.value);
 
-  const handleInputChange = (field) => (e) => {
-    onUpdate(participant.tempId, field, e.target.value);
-  };
+  const cardClass = darkMode
+    ? "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-800 border-gray-700 shadow-sm"
+    : "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm";
+
+  const inputClass = darkMode
+    ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-gray-500 focus:border-gray-500"
+    : "bg-green-50 border-green-200";
+
+  const labelClass = darkMode ? "text-gray-200 text-xs" : "text-green-600 text-xs";
+  const buttonClass = darkMode
+    ? "ml-1 shrink-0 text-gray-100 bg-gray-700 hover:bg-gray-600 border-gray-600"
+    : "ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950";
 
   return (
-    <Card className="flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm">
+    <Card className={cardClass}>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 flex-grow">
         <div className="flex flex-col">
-          <Label htmlFor={`initiative-${participant.tempId}`} className="text-xs text-green-600">Initiative</Label>
+          <Label htmlFor={`initiative-${participant.tempId}`} className={labelClass}>Initiative</Label>
           <Input
             id={`initiative-${participant.tempId}`}
             type="number"
             value={participant.initiative || ""}
             placeholder="0"
             onChange={handleInputChange("initiative")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col col-span-1">
-          <Label className="text-xs text-green-600">Name</Label>
+          <Label className={labelClass}>Name</Label>
           <Input
             type="text"
             value={participant.display_name}
             onChange={handleInputChange("display_name")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`hp-${participant.tempId}`} className="text-xs text-green-600">HP</Label>
+          <Label htmlFor={`hp-${participant.tempId}`} className={labelClass}>HP</Label>
           <div className="flex items-center gap-2">
             <Input
               id={`hp-${participant.tempId}`}
@@ -53,7 +61,7 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete }) {
               value={participant.current_hp || ""}
               placeholder="HP"
               onChange={handleInputChange("current_hp")}
-              className="bg-green-50 border-green-200 w-16"
+              className={`${inputClass} w-16`}
             />
             <div className="flex flex-grow items-center">
               <Input
@@ -61,12 +69,12 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete }) {
                 value={damageTaken}
                 placeholder="Dmg"
                 onChange={handleDamageChange}
-                className="bg-green-50 border-green-200 w-20"
+                className={`${inputClass} w-20`}
               />
               <Button
                 variant="outline"
                 size="icon"
-                className="ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950"
+                className={buttonClass}
                 onClick={handleSubtractDamage}
               >
                 -
@@ -75,25 +83,25 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete }) {
           </div>
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`ac-${participant.tempId}`} className="text-xs text-green-600">AC</Label>
+          <Label htmlFor={`ac-${participant.tempId}`} className={labelClass}>AC</Label>
           <Input
             id={`ac-${participant.tempId}`}
             type="number"
             value={participant.ac || ""}
             placeholder="AC"
             onChange={handleInputChange("ac")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`notes-${participant.tempId}`} className="text-xs text-green-600">Notes</Label>
+          <Label htmlFor={`notes-${participant.tempId}`} className={labelClass}>Notes</Label>
           <Input
             id={`notes-${participant.tempId}`}
             type="text"
             value={participant.notes || ""}
             placeholder="Notes"
             onChange={handleInputChange("notes")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
       </div>
@@ -101,7 +109,7 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete }) {
         <Button
           variant="ghost"
           size="sm"
-          className="text-white bg-green-900 hover:bg-green-800 border-green-950 mr-2"
+          className={`${buttonClass} mr-2`}
           onClick={() => onDelete(participant.tempId)}
         >
           Delete
@@ -111,26 +119,20 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete }) {
   );
 }
 
-// The main Quick Encounter component
+// Main component
 export default function QuickEncounter() {
+  const { darkMode } = useDarkMode();
   const [participants, setParticipants] = useState([]);
 
   const handleAddParticipant = () => {
-    const newParticipant = {
-      tempId: Date.now(),
-      initiative: null,
-      display_name: "",
-      current_hp: null,
-      ac: null,
-      notes: "",
-    };
-    setParticipants([...participants, newParticipant]);
+    setParticipants([
+      ...participants,
+      { tempId: Date.now(), initiative: null, display_name: "", current_hp: null, ac: null, notes: "" }
+    ]);
   };
 
   const handleDeleteParticipant = (tempId) => {
-    setParticipants((prevParticipants) =>
-      prevParticipants.filter((p) => p.tempId !== tempId)
-    );
+    setParticipants((prev) => prev.filter((p) => p.tempId !== tempId));
   };
 
   const handleUpdateParticipant = (tempId, field, value) => {
@@ -151,25 +153,23 @@ export default function QuickEncounter() {
     );
   };
 
-  const sortedParticipants = [...participants].sort((a, b) => {
-    return (b.initiative || 0) - (a.initiative || 0);
-  });
+  const sortedParticipants = [...participants].sort((a, b) => (b.initiative || 0) - (a.initiative || 0));
 
   return (
-    <div className="p-6 bg-white min-h-screen">
+    <div className={`p-6 min-h-screen ${darkMode ? "bg-gray-900" : "bg-white"}`}>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-green-700">Quick Encounter</h1>
+        <h1 className={`text-2xl font-bold ${darkMode ? "text-gray-100" : "text-green-700"}`}>Quick Encounter</h1>
         <Button
           onClick={handleAddParticipant}
           variant="outline"
-          className="bg-green-600 hover:bg-green-500 text-white"
+          className={darkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-100" : "bg-green-600 hover:bg-green-500 text-white"}
         >
           Add Participant
         </Button>
       </div>
 
-      <div className="rounded-md border border-green-200">
-        <div className="hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 bg-green-100 font-semibold text-green-700">
+      <div className={`rounded-md border ${darkMode ? "border-gray-700" : "border-green-200"}`}>
+        <div className={`hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 font-semibold ${darkMode ? "bg-gray-800 text-gray-100" : "bg-green-100 text-green-700"}`}>
           <div>Initiative</div>
           <div className="col-span-1">Name</div>
           <div>HP</div>
@@ -183,14 +183,16 @@ export default function QuickEncounter() {
             onUpdate={handleUpdateParticipant}
             onDamage={handleDamage}
             onDelete={handleDeleteParticipant}
+            darkMode={darkMode}
           />
         ))}
       </div>
-      <div className="text-center mt-4">
-        {participants.length === 0 && (
-            <p className="text-gray-500">Add a participant to begin.</p>
-        )}
-      </div>
+
+      {participants.length === 0 && (
+        <div className={`text-center mt-4 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+          Add a participant to begin.
+        </div>
+      )}
     </div>
   );
 }

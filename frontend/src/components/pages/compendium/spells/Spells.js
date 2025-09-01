@@ -17,8 +17,10 @@ import {
   TableRow,
 } from "../../../ui/table";
 import API from "../../../../api";
+import { useDarkMode } from "../../../../context/DarkModeContext";
 
 export default function Spells() {
+  const { darkMode } = useDarkMode();
   const [spells, setSpells] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -62,16 +64,48 @@ export default function Spells() {
     setFiltered(result);
   }, [search, schoolFilter, sortBy, spells]);
 
+  const inputClasses = darkMode
+    ? "bg-gray-700 text-gray-100 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
+    : "bg-green-50 text-gray-900 border-green-200 focus:border-green-300 focus:ring-green-300";
+
+  const selectTriggerClasses = darkMode
+    ? "bg-gray-700 text-gray-100 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
+    : "bg-green-50 text-gray-900 border-green-200 focus:border-green-300 focus:ring-green-300";
+
+  const tableHeaderClasses = darkMode
+    ? "bg-gray-800 text-gray-200 font-semibold"
+    : "bg-green-100 text-green-700 font-semibold";
+
+  const tableRowClasses = darkMode
+    ? "hover:bg-gray-700"
+    : "hover:bg-green-50";
+
+  const tableCellLinkClasses = darkMode
+    ? "text-blue-400 hover:underline font-medium"
+    : "text-green-600 hover:underline font-medium";
+
+  const tableCellTextClasses = darkMode
+    ? "text-gray-200"
+    : "text-gray-700";
+
+  const tableBorderClasses = darkMode
+    ? "border-gray-600"
+    : "border-green-200";
+
+  const badgeClasses = darkMode
+    ? "inline-flex items-center rounded-full bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-100"
+    : "inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800";
+
   return (
-    <div className="p-6 bg-white h-screen overflow-y-auto">
-      <h1 className="text-2xl font-semibold text-green-700 mb-6">
+    <div className={`p-6 h-screen overflow-y-auto ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+      <h1 className={`text-2xl font-semibold mb-6 ${darkMode ? "text-gray-100" : "text-green-700"}`}>
         Spell Browser
       </h1>
 
       {/* Controls */}
       <div className="flex flex-wrap items-end gap-4 mb-6">
         <div className="flex flex-col">
-          <label htmlFor="search" className="text-sm text-green-600 mb-1">
+          <label htmlFor="search" className={`text-sm mb-1 ${darkMode ? "text-gray-200" : "text-green-600"}`}>
             Search
           </label>
           <Input
@@ -80,82 +114,76 @@ export default function Spells() {
             placeholder="Search spells..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300"
+            className={`w-64 ${inputClasses}`}
           />
         </div>
+
         <div className="flex flex-col">
-          <label htmlFor="school-filter" className="text-sm text-green-600 mb-1">
+          <label htmlFor="school-filter" className={`text-sm mb-1 ${darkMode ? "text-gray-200" : "text-green-600"}`}>
             School
           </label>
-          <Select
-            value={schoolFilter}
-            onValueChange={(value) => setSchoolFilter(value)}
-          >
-            <SelectTrigger id="school-filter" className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300">
+          <Select value={schoolFilter} onValueChange={(value) => setSchoolFilter(value)}>
+            <SelectTrigger id="school-filter" className={`w-40 ${selectTriggerClasses}`}>
               <SelectValue placeholder="All Schools" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-green-200 shadow-lg">
-              <SelectItem value="all" className="hover:bg-green-100 focus:bg-green-100">All Schools</SelectItem>
-              <SelectItem value="abjuration" className="hover:bg-green-100 focus:bg-green-100">Abjuration</SelectItem>
-              <SelectItem value="conjuration" className="hover:bg-green-100 focus:bg-green-100">Conjuration</SelectItem>
-              <SelectItem value="divination" className="hover:bg-green-100 focus:bg-green-100">Divination</SelectItem>
-              <SelectItem value="enchantment" className="hover:bg-green-100 focus:bg-green-100">Enchantment</SelectItem>
-              <SelectItem value="evocation" className="hover:bg-green-100 focus:bg-green-100">Evocation</SelectItem>
-              <SelectItem value="illusion" className="hover:bg-green-100 focus:bg-green-100">Illusion</SelectItem>
-              <SelectItem value="necromancy" className="hover:bg-green-100 focus:bg-green-100">Necromancy</SelectItem>
-              <SelectItem value="transmutation" className="hover:bg-green-100 focus:bg-green-100">Transmutation</SelectItem>
+            <SelectContent className={darkMode ? "bg-gray-800 text-gray-100 border-gray-600" : "bg-white text-gray-900 border-green-200"}>
+              <SelectItem value="all" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>All Schools</SelectItem>
+              <SelectItem value="abjuration" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Abjuration</SelectItem>
+              <SelectItem value="conjuration" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Conjuration</SelectItem>
+              <SelectItem value="divination" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Divination</SelectItem>
+              <SelectItem value="enchantment" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Enchantment</SelectItem>
+              <SelectItem value="evocation" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Evocation</SelectItem>
+              <SelectItem value="illusion" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Illusion</SelectItem>
+              <SelectItem value="necromancy" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Necromancy</SelectItem>
+              <SelectItem value="transmutation" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Transmutation</SelectItem>
             </SelectContent>
           </Select>
         </div>
+
         <div className="flex flex-col">
-          <label htmlFor="sort-by" className="text-sm text-green-600 mb-1">
+          <label htmlFor="sort-by" className={`text-sm mb-1 ${darkMode ? "text-gray-200" : "text-green-600"}`}>
             Sort By
           </label>
-          <Select
-            value={sortBy}
-            onValueChange={(value) => setSortBy(value)}
-          >
-            <SelectTrigger id="sort-by" className="w-40 bg-green-50 border-green-200 focus:border-green-300 focus:ring-green-300">
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
+            <SelectTrigger id="sort-by" className={`w-40 ${selectTriggerClasses}`}>
               <SelectValue placeholder="Name" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-green-200 shadow-lg">
-              <SelectItem value="name" className="hover:bg-green-100 focus:bg-green-100">Name</SelectItem>
-              <SelectItem value="level" className="hover:bg-green-100 focus:bg-green-100">Level</SelectItem>
+            <SelectContent className={darkMode ? "bg-gray-800 text-gray-100 border-gray-600" : "bg-white text-gray-900 border-green-200"}>
+              <SelectItem value="name" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Name</SelectItem>
+              <SelectItem value="level" className={darkMode ? "hover:bg-gray-700 focus:bg-gray-700" : "hover:bg-green-100 focus:bg-green-100"}>Level</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      {/* Spell table */}
-      <div className="overflow-x-auto rounded-md border border-green-200">
+      {/* Spell Table */}
+      <div className={`overflow-x-auto rounded-md border ${tableBorderClasses}`}>
         <Table>
           <TableHeader>
-            <TableRow className="bg-green-100 hover:bg-green-100">
-              <TableHead className="text-green-700">Name</TableHead>
-              <TableHead className="text-green-700">School</TableHead>
-              <TableHead className="text-green-700">Level</TableHead>
-              <TableHead className="text-green-700">Classes</TableHead>
+            <TableRow className={tableHeaderClasses}>
+              <TableHead>Name</TableHead>
+              <TableHead>School</TableHead>
+              <TableHead>Level</TableHead>
+              <TableHead>Classes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((spell) => (
-              <TableRow key={spell.id} className="hover:bg-green-50">
+              <TableRow key={spell.id} className={tableRowClasses}>
                 <TableCell>
                   <Link
                     to={`/dashboard/spells/${spell.slug}`}
-                    className="text-green-600 hover:underline font-medium"
+                    className={tableCellLinkClasses}
                   >
                     {spell.name}
                   </Link>
                 </TableCell>
-                <TableCell>{spell.school}</TableCell>
-                <TableCell>{spell.level}</TableCell>
+                <TableCell className={tableCellTextClasses}>{spell.school}</TableCell>
+                <TableCell className={tableCellTextClasses}>{spell.level}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {spell.classes.map((cls) => (
-                      <span key={cls} className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                        {cls}
-                      </span>
+                      <span key={cls} className={badgeClasses}>{cls}</span>
                     ))}
                   </div>
                 </TableCell>
