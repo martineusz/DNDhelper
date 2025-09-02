@@ -5,49 +5,57 @@ import { Input } from "../../../ui/input";
 import { Button } from "../../../ui/button";
 import { Card } from "../../../ui/card";
 import { Label } from "../../../ui/label";
+import { useDarkMode } from "../../../../context/DarkModeContext";
 
-// A component for a single participant row, handling its own state for damage input
-function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
+function ParticipantRow({ participant, onUpdate, onDamage, onDelete, darkMode }) {
   const [damageTaken, setDamageTaken] = useState("");
 
-  const handleDamageChange = (e) => {
-    setDamageTaken(e.target.value);
-  };
-
+  const handleDamageChange = (e) => setDamageTaken(e.target.value);
   const handleSubtractDamage = () => {
     onDamage(participant.tempId, parseInt(damageTaken, 10) || 0);
     setDamageTaken("");
   };
+  const handleInputChange = (field) => (e) => onUpdate(participant.tempId, field, e.target.value);
 
-  const handleInputChange = (field) => (e) => {
-    onUpdate(participant.tempId, field, e.target.value);
-  };
+  const cardClass = darkMode
+    ? "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-800 border-gray-700 shadow-sm"
+    : "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm";
+
+  const inputClass = darkMode
+    ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-gray-500 focus:border-gray-500"
+    : "bg-green-50 border-green-200";
+
+  const labelClass = darkMode ? "text-gray-200 text-xs" : "text-green-600 text-xs";
+
+  const buttonClass = darkMode
+    ? "ml-1 shrink-0 text-gray-100 bg-gray-700 hover:bg-gray-600 border-gray-600"
+    : "ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950";
 
   return (
-    <Card className="flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm">
+    <Card className={cardClass}>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 flex-grow">
         <div className="flex flex-col">
-          <Label htmlFor={`initiative-${participant.tempId}`} className="text-xs text-green-600">Initiative</Label>
+          <Label htmlFor={`initiative-${participant.tempId}`} className={labelClass}>Initiative</Label>
           <Input
             id={`initiative-${participant.tempId}`}
             type="number"
             value={participant.initiative || ""}
             placeholder="0"
             onChange={handleInputChange("initiative")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col col-span-1">
-          <Label className="text-xs text-green-600">Name</Label>
+          <Label className={labelClass}>Name</Label>
           <Input
             type="text"
             value={participant.display_name}
             onChange={handleInputChange("display_name")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`hp-${participant.tempId}`} className="text-xs text-green-600">HP</Label>
+          <Label htmlFor={`hp-${participant.tempId}`} className={labelClass}>HP</Label>
           <div className="flex items-center gap-2">
             <Input
               id={`hp-${participant.tempId}`}
@@ -55,7 +63,7 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
               value={participant.current_hp || ""}
               placeholder="HP"
               onChange={handleInputChange("current_hp")}
-              className="bg-green-50 border-green-200 w-16"
+              className={`${inputClass} w-16`}
             />
             <div className="flex flex-grow items-center">
               <Input
@@ -63,12 +71,12 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
                 value={damageTaken}
                 placeholder="Dmg"
                 onChange={handleDamageChange}
-                className="bg-green-50 border-green-200 w-20"
+                className={`${inputClass} w-20`}
               />
               <Button
                 variant="outline"
                 size="icon"
-                className="ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950"
+                className={buttonClass}
                 onClick={handleSubtractDamage}
               >
                 -
@@ -77,25 +85,25 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
           </div>
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`ac-${participant.tempId}`} className="text-xs text-green-600">AC</Label>
+          <Label htmlFor={`ac-${participant.tempId}`} className={labelClass}>AC</Label>
           <Input
             id={`ac-${participant.tempId}`}
             type="number"
             value={participant.ac || ""}
             placeholder="AC"
             onChange={handleInputChange("ac")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor={`notes-${participant.tempId}`} className="text-xs text-green-600">Notes</Label>
+          <Label htmlFor={`notes-${participant.tempId}`} className={labelClass}>Notes</Label>
           <Input
             id={`notes-${participant.tempId}`}
             type="text"
             value={participant.notes || ""}
             placeholder="Notes"
             onChange={handleInputChange("notes")}
-            className="bg-green-50 border-green-200"
+            className={inputClass}
           />
         </div>
       </div>
@@ -103,7 +111,7 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
         <Button
           variant="ghost"
           size="sm"
-          className="text-white bg-green-900 hover:bg-green-800 border-green-950 mr-2"
+          className={`${buttonClass} mr-2`}
           onClick={() => onDelete(participant.tempId)}
         >
           Delete
@@ -113,10 +121,11 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDelete }) {
   );
 }
 
-// The main Encounter View component
 export default function EncounterView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { darkMode } = useDarkMode();
+
   const [encounter, setEncounter] = useState(null);
   const [editableName, setEditableName] = useState("");
   const [participants, setParticipants] = useState([]);
@@ -165,9 +174,7 @@ export default function EncounterView() {
     );
   };
 
-  const handleNameChange = (e) => {
-    setEditableName(e.target.value);
-  };
+  const handleNameChange = (e) => setEditableName(e.target.value);
 
   const handleDamage = (tempId, damage) => {
     setParticipants((prev) =>
@@ -183,9 +190,7 @@ export default function EncounterView() {
 
   const handleDeleteParticipant = async (tempId) => {
     const participantToDelete = participants.find(p => p.tempId === tempId);
-    if (!participantToDelete || !participantToDelete.id) {
-      return;
-    }
+    if (!participantToDelete || !participantToDelete.id) return;
 
     const endpoint = participantToDelete.type === 'player'
       ? `encounters/player_data/${participantToDelete.id}/`
@@ -193,14 +198,14 @@ export default function EncounterView() {
 
     try {
       await API.delete(endpoint);
-      setParticipants(prevParticipants => prevParticipants.filter(p => p.tempId !== tempId));
+      setParticipants(prev => prev.filter(p => p.tempId !== tempId));
     } catch (err) {
       console.error("Failed to delete participant:", err);
     }
   };
 
   const handleAddPlayer = () => {
-    const newPlayer = {
+    setParticipants(prev => [...prev, {
       type: "player",
       display_name: "New Player",
       initiative: null,
@@ -208,12 +213,11 @@ export default function EncounterView() {
       ac: null,
       notes: "",
       tempId: `new-player-${Date.now()}`,
-    };
-    setParticipants((prev) => [...prev, newPlayer]);
+    }]);
   };
 
   const handleAddMonster = () => {
-    const newMonster = {
+    setParticipants(prev => [...prev, {
       type: "monster",
       display_name: "New Monster",
       initiative: null,
@@ -221,42 +225,37 @@ export default function EncounterView() {
       ac: null,
       notes: "",
       tempId: `new-monster-${Date.now()}`,
-    };
-    setParticipants((prev) => [...prev, newMonster]);
+    }]);
   };
 
   const handleSaveEncounter = async () => {
     setIsSaving(true);
     try {
-      const playerPayload = participants
-        .filter((p) => p.type === "player")
-        .map((p) => ({
-          id: p.id,
-          player_character_id: p.original_id || null,
-          name: p.display_name,
-          initiative: p.initiative,
-          current_hp: p.current_hp,
-          notes: p.notes,
-          ac: p.ac,
-        }));
+      const playerPayload = participants.filter(p => p.type === "player").map(p => ({
+        id: p.id,
+        player_character_id: p.original_id || null,
+        name: p.display_name,
+        initiative: p.initiative,
+        current_hp: p.current_hp,
+        notes: p.notes,
+        ac: p.ac,
+      }));
 
-      const monsterPayload = participants
-        .filter((p) => p.type === "monster")
-        .map((p) => ({
-          id: p.id,
-          monster_id: p.original_id || null,
-          name: p.display_name,
-          initiative: p.initiative,
-          current_hp: p.current_hp,
-          notes: p.notes,
-          ac: p.ac,
-        }));
+      const monsterPayload = participants.filter(p => p.type === "monster").map(p => ({
+        id: p.id,
+        monster_id: p.original_id || null,
+        name: p.display_name,
+        initiative: p.initiative,
+        current_hp: p.current_hp,
+        notes: p.notes,
+        ac: p.ac,
+      }));
 
       const payload = {
-          name: editableName,
-          description: encounter.description,
-          player_data: playerPayload,
-          monster_data: monsterPayload,
+        name: editableName,
+        description: encounter.description,
+        player_data: playerPayload,
+        monster_data: monsterPayload,
       };
 
       await API.put(`encounters/${id}/`, payload);
@@ -267,18 +266,17 @@ export default function EncounterView() {
     }
   };
 
-  const sortedParticipants = [...participants].sort((a, b) => {
-    return (b.initiative || 0) - (a.initiative || 0);
-  });
+  const sortedParticipants = [...participants].sort((a, b) => (b.initiative || 0) - (a.initiative || 0));
 
   if (loading) return <p className="p-6 text-gray-700">Loading encounter...</p>;
   if (error) return <p className="p-6 text-red-500 font-bold">Error: {error}</p>;
   if (!encounter) return <p className="p-6 text-gray-700">Encounter not found.</p>;
 
   return (
-    <div className="p-6 bg-green-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${darkMode ? "bg-gray-900" : "bg-green-50"}`}>
       <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => navigate(-1)} variant="outline" className="bg-green-100 text-green-700 hover:bg-green-200">
+        <Button onClick={() => navigate(-1)} variant="outline"
+          className={`${darkMode ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-green-100 text-green-700 hover:bg-green-200"}`}>
           &larr; Back
         </Button>
         <div className="text-center flex-grow">
@@ -286,37 +284,28 @@ export default function EncounterView() {
             type="text"
             value={editableName}
             onChange={handleNameChange}
-            className="text-2xl font-bold text-center text-green-700 mb-1 border-none bg-transparent focus-visible:ring-0"
+            className={`text-2xl font-bold text-center mb-1 border-none bg-transparent focus-visible:ring-0 ${darkMode ? "text-gray-100" : "text-green-700"}`}
           />
-          <p className="text-green-600 text-sm">{encounter.description}</p>
+          <p className={`${darkMode ? "text-gray-300" : "text-green-600"} text-sm`}>{encounter.description}</p>
         </div>
         <div className="flex gap-2">
-            <Button
-              onClick={handleAddPlayer}
-              variant="outline"
-              className="bg-green-600 hover:bg-green-500 text-white"
-            >
-              Add Player
-            </Button>
-            <Button
-              onClick={handleAddMonster}
-              variant="outline"
-              className="bg-green-600 hover:bg-green-500 text-white"
-            >
-              Add Monster
-            </Button>
-            <Button
-              onClick={handleSaveEncounter}
-              disabled={isSaving}
-              className="bg-green-700 hover:bg-green-600 text-white"
-            >
-              {isSaving ? "Saving..." : "Save Encounter"}
-            </Button>
+          <Button onClick={handleAddPlayer} variant="outline"
+            className={`${darkMode ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-green-600 hover:bg-green-500 text-white"}`}>
+            Add Player
+          </Button>
+          <Button onClick={handleAddMonster} variant="outline"
+            className={`${darkMode ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-green-600 hover:bg-green-500 text-white"}`}>
+            Add Monster
+          </Button>
+          <Button onClick={handleSaveEncounter} disabled={isSaving}
+            className={`${darkMode ? "bg-gray-800 hover:bg-gray-700 text-gray-100" : "bg-green-700 hover:bg-green-600 text-white"}`}>
+            {isSaving ? "Saving..." : "Save Encounter"}
+          </Button>
         </div>
       </div>
 
-      <div className="rounded-md border border-green-200">
-        <div className="hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 bg-green-100 font-semibold text-green-700">
+      <div className={`rounded-md border ${darkMode ? "border-gray-700" : "border-green-200"}`}>
+        <div className={`hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 font-semibold ${darkMode ? "bg-gray-800 text-gray-100" : "bg-green-100 text-green-700"}`}>
           <div>Initiative</div>
           <div className="col-span-1">Name</div>
           <div>HP</div>
@@ -330,6 +319,7 @@ export default function EncounterView() {
             onUpdate={handleUpdateParticipant}
             onDamage={handleDamage}
             onDelete={handleDeleteParticipant}
+            darkMode={darkMode}
           />
         ))}
       </div>

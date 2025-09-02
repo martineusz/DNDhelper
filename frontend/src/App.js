@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { DarkModeProvider } from "./context/DarkModeContext";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -18,44 +19,55 @@ import SpellPage from "./components/pages/compendium/spells/SpellPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("access_token") // keep login on refresh
+    !!localStorage.getItem("access_token")
   );
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public pages */}
-        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
+    // 👇 wrap your entire app inside the provider
+    <DarkModeProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public pages */}
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
 
-        {/* Protected dashboard pages */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard setIsLoggedIn={setIsLoggedIn} />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="encounter-creator" element={<EncounterCreator />} />
-          <Route path="encounters" element={<Encounters />} />
-          <Route path="encounters/:id" element={<EncounterView />} />
-          <Route path="quick" element={<QuickEncounter />} />
-          <Route path="campaigns" element={<Campaigns />} />
-          <Route path="players" element={<Players />} />
-          <Route path="monsters" element={<Monsters />} />
-          <Route path="spells" element={<Spells />} />
-          <Route path="spells/:slug" element={<SpellPage />} />
-          <Route index element={<Navigate to="encounters" />} />
-        </Route>
+          {/* Protected dashboard pages */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard setIsLoggedIn={setIsLoggedIn} />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="encounter-creator" element={<EncounterCreator />} />
+            <Route path="encounters" element={<Encounters />} />
+            <Route path="encounters/:id" element={<EncounterView />} />
+            <Route path="quick" element={<QuickEncounter />} />
+            <Route path="campaigns" element={<Campaigns />} />
+            <Route path="players" element={<Players />} />
+            <Route path="monsters" element={<Monsters />} />
+            <Route path="spells" element={<Spells />} />
+            <Route path="spells/:slug" element={<SpellPage />} />
+            <Route index element={<Navigate to="encounters" />} />
+          </Route>
 
-        {/* Fallback */}
-        <Route
-          path="*"
-          element={<Navigate to={localStorage.getItem("access_token") ? "/dashboard" : "/login"} />}
-        />
-      </Routes>
-    </BrowserRouter>
+          {/* Fallback */}
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to={
+                  localStorage.getItem("access_token")
+                    ? "/dashboard"
+                    : "/login"
+                }
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </DarkModeProvider>
   );
 }
 

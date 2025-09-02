@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Badge } from "../../../ui/badge";
 import { Separator } from "../../../ui/separator";
 import API from "../../../../api";
+import { useDarkMode } from "../../../../context/DarkModeContext";
 
 export default function SpellPage() {
+  const { darkMode } = useDarkMode();
   const { slug } = useParams();
   const [spell, setSpell] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,64 +28,75 @@ export default function SpellPage() {
     fetchSpell();
   }, [slug]);
 
-  if (loading) return <div className="p-6">Loading spell...</div>;
+  if (loading) return <div className={`p-6 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>Loading spell...</div>;
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
   if (!spell) return null;
 
+  const textMuted = darkMode ? "text-gray-400" : "text-muted-foreground";
+  const textMain = darkMode ? "text-gray-100" : "text-gray-900";
+  const cardBg = darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
+  const badgeOutline = darkMode ? "border-gray-400 text-gray-200" : "";
+  const badgeSecondary = darkMode ? "bg-gray-700 text-gray-100" : "";
+
   return (
-    <div className="p-6">
-      <Card>
+    <div className={`${darkMode ? "bg-gray-900" : "bg-gray-50"} p-6 min-h-screen`}>
+      <Card className={`${cardBg}`}>
         <CardHeader>
-          <CardTitle className="capitalize">
+          <CardTitle className={`capitalize ${textMain}`}>
             {spell.name.replace(/-/g, " ")}
           </CardTitle>
           <CardDescription>
-            <Badge variant="outline" className="mr-2">{`Level ${spell.level}`}</Badge>
-            <Badge variant="secondary" className="mr-2">{spell.school}</Badge>
+            <Badge variant="outline" className={`mr-2 ${badgeOutline}`}>{`Level ${spell.level}`}</Badge>
+            <Badge variant="secondary" className={`mr-2 ${badgeSecondary}`}>{spell.school}</Badge>
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-muted-foreground">Cast Time</span>
-              <span className="text-base">{spell.cast_time}</span>
+              <span className={`text-sm font-medium ${textMuted}`}>Cast Time</span>
+              <span className={`text-base ${textMain}`}>{spell.cast_time}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-muted-foreground">Range</span>
-              <span className="text-base">{spell.range}</span>
+              <span className={`text-sm font-medium ${textMuted}`}>Range</span>
+              <span className={`text-base ${textMain}`}>{spell.range}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-muted-foreground">Duration</span>
-              <span className="text-base">{spell.duration}</span>
+              <span className={`text-sm font-medium ${textMuted}`}>Duration</span>
+              <span className={`text-base ${textMain}`}>{spell.duration}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-muted-foreground">Components</span>
+              <span className={`text-sm font-medium ${textMuted}`}>Components</span>
               <div className="flex items-center gap-1">
-                {spell.verbal && <Badge>V</Badge>}
-                {spell.somatic && <Badge>S</Badge>}
-                {spell.material && <Badge>M</Badge>}
+                {spell.verbal && <Badge className={`${badgeSecondary}`}>V</Badge>}
+                {spell.somatic && <Badge className={`${badgeSecondary}`}>S</Badge>}
+                {spell.material && <Badge className={`${badgeSecondary}`}>M</Badge>}
               </div>
             </div>
           </div>
-          <Separator className="my-2" />
+
+          <Separator className={`${darkMode ? "border-gray-600" : "my-2"}`} />
+
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">Classes</span>
+            <span className={`text-sm font-medium ${textMuted}`}>Classes</span>
             <div className="flex flex-wrap gap-2 mt-1">
               {spell.classes.map((cls) => (
-                <Badge key={cls} variant="outline">{cls}</Badge>
+                <Badge key={cls} variant="outline" className={`${badgeOutline}`}>{cls}</Badge>
               ))}
             </div>
           </div>
+
           {spell.material_cost && (
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-muted-foreground">Material Cost</span>
-              <span className="text-base">{spell.material_cost}</span>
+              <span className={`text-sm font-medium ${textMuted}`}>Material Cost</span>
+              <span className={`text-base ${textMain}`}>{spell.material_cost}</span>
             </div>
           )}
-          <Separator className="my-2" />
+
+          <Separator className={`${darkMode ? "border-gray-600" : "my-2"}`} />
+
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">Description</span>
-            <p className="text-sm text-gray-700 leading-relaxed mt-1">{spell.description}</p>
+            <span className={`text-sm font-medium ${textMuted}`}>Description</span>
+            <p className={`text-sm leading-relaxed mt-1 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>{spell.description}</p>
           </div>
         </CardContent>
       </Card>
