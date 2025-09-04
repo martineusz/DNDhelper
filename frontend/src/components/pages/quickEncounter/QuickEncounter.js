@@ -17,17 +17,21 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete, darkMode
   const handleInputChange = (field) => (e) => onUpdate(participant.tempId, field, e.target.value);
 
   const cardClass = darkMode
-    ? "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-800 border-gray-700 shadow-sm"
+    ? "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-800 border-green-700 shadow-sm"
     : "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm";
 
   const inputClass = darkMode
-    ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-gray-500 focus:border-gray-500"
+    ? "bg-gray-700 border-green-600 text-gray-100 focus:ring-green-500 focus:border-green-500"
     : "bg-green-50 border-green-200";
 
   const labelClass = darkMode ? "text-gray-200 text-xs" : "text-green-600 text-xs";
   const buttonClass = darkMode
-    ? "ml-1 shrink-0 text-gray-100 bg-gray-700 hover:bg-gray-600 border-gray-600"
+    ? "ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950"
     : "ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950";
+
+  const deleteButtonClass = darkMode
+    ? "text-gray-100 hover:bg-green-900"
+    : "text-green-700 hover:bg-green-200";
 
   return (
     <Card className={cardClass}>
@@ -109,7 +113,7 @@ function QuickEncounterRow({ participant, onUpdate, onDamage, onDelete, darkMode
         <Button
           variant="ghost"
           size="sm"
-          className={`${buttonClass} mr-2`}
+          className={`${deleteButtonClass} mr-2`}
           onClick={() => onDelete(participant.tempId)}
         >
           Delete
@@ -158,18 +162,17 @@ export default function QuickEncounter() {
   return (
     <div className={`p-6 min-h-screen ${darkMode ? "bg-gray-900" : "bg-white"}`}>
       <div className="flex justify-between items-center mb-6">
-        <h1 className={`text-2xl font-bold ${darkMode ? "text-gray-100" : "text-green-700"}`}>Quick Encounter</h1>
+        <h1 className={`text-2xl font-bold ${darkMode ? "text-green-400" : "text-green-700"}`}>Quick Encounter</h1>
         <Button
           onClick={handleAddParticipant}
-          variant="outline"
-          className={darkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-100" : "bg-green-600 hover:bg-green-500 text-white"}
+          className={darkMode ? "bg-green-600 hover:bg-green-500 text-white" : "bg-green-600 hover:bg-green-500 text-white"}
         >
           Add Participant
         </Button>
       </div>
 
-      <div className={`rounded-md border ${darkMode ? "border-gray-700" : "border-green-200"}`}>
-        <div className={`hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 font-semibold ${darkMode ? "bg-gray-800 text-gray-100" : "bg-green-100 text-green-700"}`}>
+      <div className={`rounded-md border ${darkMode ? "border-green-700" : "border-green-200"}`}>
+        <div className={`hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 font-semibold ${darkMode ? "bg-green-900 text-green-200" : "bg-green-100 text-green-700"}`}>
           <div>Initiative</div>
           <div className="col-span-1">Name</div>
           <div>HP</div>

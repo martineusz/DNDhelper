@@ -32,14 +32,15 @@ export default function SpellPage() {
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
   if (!spell) return null;
 
-  const textMuted = darkMode ? "text-gray-400" : "text-muted-foreground";
-  const textMain = darkMode ? "text-gray-100" : "text-gray-900";
-  const cardBg = darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
-  const badgeOutline = darkMode ? "border-gray-400 text-gray-200" : "";
-  const badgeSecondary = darkMode ? "bg-gray-700 text-gray-100" : "";
+  const textMuted = darkMode ? "text-gray-400" : "text-gray-500";
+  const textMain = darkMode ? "text-green-300" : "text-green-700";
+  const cardBg = darkMode ? "bg-gray-800 border-green-700" : "bg-green-50 border-green-200";
+  const badgeOutline = darkMode ? "border-green-400 text-green-200" : "border-green-400 text-green-700";
+  const badgeSecondary = darkMode ? "bg-green-700 text-white" : "bg-green-200 text-green-800";
+  const descriptionText = darkMode ? "text-gray-200" : "text-gray-700";
 
   return (
-    <div className={`${darkMode ? "bg-gray-900" : "bg-gray-50"} p-6 min-h-screen`}>
+    <div className={`${darkMode ? "bg-gray-900" : "bg-white"} p-6 min-h-screen`}>
       <Card className={`${cardBg}`}>
         <CardHeader>
           <CardTitle className={`capitalize ${textMain}`}>
@@ -74,7 +75,7 @@ export default function SpellPage() {
             </div>
           </div>
 
-          <Separator className={`${darkMode ? "border-gray-600" : "my-2"}`} />
+          <Separator className={`${darkMode ? "bg-green-600" : "bg-green-200"}`} />
 
           <div className="flex flex-col">
             <span className={`text-sm font-medium ${textMuted}`}>Classes</span>
@@ -92,11 +93,11 @@ export default function SpellPage() {
             </div>
           )}
 
-          <Separator className={`${darkMode ? "border-gray-600" : "my-2"}`} />
+          <Separator className={`${darkMode ? "bg-green-600" : "bg-green-200"}`} />
 
           <div className="flex flex-col">
             <span className={`text-sm font-medium ${textMuted}`}>Description</span>
-            <p className={`text-sm leading-relaxed mt-1 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>{spell.description}</p>
+            <p className={`text-sm leading-relaxed mt-1 ${descriptionText}`}>{spell.description}</p>
           </div>
         </CardContent>
       </Card>

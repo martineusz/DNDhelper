@@ -67,15 +67,15 @@ export default function Monsters() {
   }, [search, typeFilter, sortBy, monsters]);
 
   const inputClasses = darkMode
-    ? "bg-gray-700 text-gray-100 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
+    ? "bg-gray-700 text-gray-100 border-green-600 focus:border-green-500 focus:ring-green-500"
     : "bg-green-50 text-gray-900 border-green-200 focus:border-green-300 focus:ring-green-300";
 
   const selectTriggerClasses = darkMode
-    ? "bg-gray-700 text-gray-100 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
+    ? "bg-gray-700 text-gray-100 border-green-600 focus:border-green-500 focus:ring-green-500"
     : "bg-green-50 text-gray-900 border-green-200 focus:border-green-300 focus:ring-green-300";
 
   const tableHeaderClasses = darkMode
-    ? "bg-gray-800 text-gray-200 font-semibold"
+    ? "bg-green-900 text-green-200 font-semibold"
     : "bg-green-100 text-green-700 font-semibold";
 
   const tableRowClasses = darkMode
@@ -83,7 +83,7 @@ export default function Monsters() {
     : "hover:bg-green-50";
 
   const tableCellLinkClasses = darkMode
-    ? "text-blue-400 hover:underline font-medium"
+    ? "text-green-400 hover:underline font-medium"
     : "text-green-600 hover:underline font-medium";
 
   const tableCellTextClasses = darkMode
@@ -91,7 +91,7 @@ export default function Monsters() {
     : "text-gray-700 font-medium";
 
   const tableBorderClasses = darkMode
-    ? "border-gray-600"
+    ? "border-green-600"
     : "border-green-200";
 
   return (
@@ -102,7 +102,7 @@ export default function Monsters() {
     >
       <h1
         className={`text-2xl font-semibold mb-6 ${
-          darkMode ? "text-gray-100" : "text-green-700"
+          darkMode ? "text-green-400" : "text-green-700"
         }`}
       >
         Monster Browser
@@ -139,7 +139,7 @@ export default function Monsters() {
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent
-              className={darkMode ? "bg-gray-800 text-gray-100 border-gray-600" : "bg-white text-gray-900 border-green-200"}
+              className={darkMode ? "bg-gray-800 text-gray-100 border-green-600" : "bg-white text-gray-900 border-green-200"}
             >
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="beast">Beast</SelectItem>
@@ -162,7 +162,7 @@ export default function Monsters() {
               <SelectValue placeholder="Name" />
             </SelectTrigger>
             <SelectContent
-              className={darkMode ? "bg-gray-800 text-gray-100 border-gray-600" : "bg-white text-gray-900 border-green-200"}
+              className={darkMode ? "bg-gray-800 text-gray-100 border-green-600" : "bg-white text-gray-900 border-green-200"}
             >
               <SelectItem value="name">Name</SelectItem>
               <SelectItem value="cr">Challenge Rating</SelectItem>
@@ -175,7 +175,13 @@ export default function Monsters() {
 
       {/* Monster Table */}
       <div className={`overflow-hidden rounded-md border ${tableBorderClasses}`}>
-        <div className="max-h-[70vh] overflow-y-auto">
+        <div
+          className="max-h-[70vh] overflow-y-auto"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${darkMode ? '#22c55e' : '#86efac'} transparent`, // scrollbar thumb and track colors
+          }}
+        >
           <Table>
             <TableHeader>
               <TableRow className={tableHeaderClasses}>

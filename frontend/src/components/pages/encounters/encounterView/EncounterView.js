@@ -17,18 +17,19 @@ function ParticipantRow({ participant, onUpdate, onDamage, onDelete, darkMode })
   };
   const handleInputChange = (field) => (e) => onUpdate(participant.tempId, field, e.target.value);
 
+  // Updated color classes for a less prominent dark mode
   const cardClass = darkMode
-    ? "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-800 border-gray-700 shadow-sm"
+    ? "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-gray-900 border-gray-700 shadow-sm"
     : "flex flex-col md:flex-row items-stretch md:items-center justify-between p-4 mb-2 bg-green-50 border border-green-200 shadow-sm";
 
   const inputClass = darkMode
-    ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-gray-500 focus:border-gray-500"
+    ? "bg-gray-800 border-gray-700 text-gray-100 focus:ring-green-500 focus:border-green-500"
     : "bg-green-50 border-green-200";
 
-  const labelClass = darkMode ? "text-gray-200 text-xs" : "text-green-600 text-xs";
+  const labelClass = darkMode ? "text-green-200 text-xs" : "text-green-600 text-xs";
 
   const buttonClass = darkMode
-    ? "ml-1 shrink-0 text-gray-100 bg-gray-700 hover:bg-gray-600 border-gray-600"
+    ? "ml-1 shrink-0 text-white bg-green-700 hover:bg-green-600 border-green-700"
     : "ml-1 shrink-0 text-white bg-green-900 hover:bg-green-800 border-green-950";
 
   return (
@@ -273,10 +274,11 @@ export default function EncounterView() {
   if (!encounter) return <p className="p-6 text-gray-700">Encounter not found.</p>;
 
   return (
-    <div className={`p-6 min-h-screen ${darkMode ? "bg-gray-900" : "bg-green-50"}`}>
+    // Updated background and border for dark mode
+    <div className={`p-6 min-h-screen ${darkMode ? "bg-gray-950" : "bg-green-50"}`}>
       <div className="flex justify-between items-center mb-6">
         <Button onClick={() => navigate(-1)} variant="outline"
-          className={`${darkMode ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-green-100 text-green-700 hover:bg-green-200"}`}>
+          className={`${darkMode ? "bg-gray-800 text-gray-100 hover:bg-gray-700" : "bg-green-100 text-green-700 hover:bg-green-200"}`}>
           &larr; Back
         </Button>
         <div className="text-center flex-grow">
@@ -290,21 +292,21 @@ export default function EncounterView() {
         </div>
         <div className="flex gap-2">
           <Button onClick={handleAddPlayer} variant="outline"
-            className={`${darkMode ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-green-600 hover:bg-green-500 text-white"}`}>
+            className={`${darkMode ? "bg-green-700 text-white hover:bg-green-600" : "bg-green-600 hover:bg-green-500 text-white"}`}>
             Add Player
           </Button>
           <Button onClick={handleAddMonster} variant="outline"
-            className={`${darkMode ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-green-600 hover:bg-green-500 text-white"}`}>
+            className={`${darkMode ? "bg-green-700 text-white hover:bg-green-600" : "bg-green-600 hover:bg-green-500 text-white"}`}>
             Add Monster
           </Button>
           <Button onClick={handleSaveEncounter} disabled={isSaving}
-            className={`${darkMode ? "bg-gray-800 hover:bg-gray-700 text-gray-100" : "bg-green-700 hover:bg-green-600 text-white"}`}>
+            className={`${darkMode ? "bg-green-900 hover:bg-green-800 text-white" : "bg-green-700 hover:bg-green-600 text-white"}`}>
             {isSaving ? "Saving..." : "Save Encounter"}
           </Button>
         </div>
       </div>
 
-      <div className={`rounded-md border ${darkMode ? "border-gray-700" : "border-green-200"}`}>
+      <div className={`rounded-md border ${darkMode ? "border-green-700" : "border-green-200"}`}>
         <div className={`hidden md:grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 p-2 font-semibold ${darkMode ? "bg-gray-800 text-gray-100" : "bg-green-100 text-green-700"}`}>
           <div>Initiative</div>
           <div className="col-span-1">Name</div>
