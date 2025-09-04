@@ -208,7 +208,7 @@ function EncounterSummary({totalPlayers, totalMonsters, totalMonsterXp, xpThresh
                 <div className="space-y-1">
                     <h3 className={`text-md font-semibold ${darkMode ? "text-gray-100" : "text-green-700"}`}>Party XP
                         Thresholds</h3>
-                    {["easy", "medium", "hard", "deadly"].map((level) => (
+                    {["EASY", "MEDIUM", "HARD", "DEADLY"].map((level) => (
                         <div key={level} className="flex justify-between items-center">
               <span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                 {level.charAt(0).toUpperCase() + level.slice(1)}:

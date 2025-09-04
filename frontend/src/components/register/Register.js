@@ -54,9 +54,9 @@ export default function Register({setIsLoggedIn}) {
                     <div className="flex justify-center mb-4">
                         <img src={dndLogo} alt="DNDHelper Logo" className="h-20 w-20"/>
                     </div>
-                    <CardTitle className="text-4xl font-extrabold text-green-800">DNDHelper</CardTitle>
+                    <CardTitle className="text-4xl font-extrabold text-green-800">D&D Encounter Helper</CardTitle>
                     <CardDescription className="text-green-600">
-                        Create an account to manage your campaigns.
+                        Create an account to manage your encounters.
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleSubmit}>

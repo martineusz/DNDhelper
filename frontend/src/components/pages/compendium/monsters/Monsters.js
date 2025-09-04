@@ -96,7 +96,7 @@ export default function Monsters() {
 
   return (
     <div
-      className={`p-6 h-screen overflow-y-auto ${
+      className={`p-6 ${
         darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"
       }`}
     >
@@ -174,42 +174,44 @@ export default function Monsters() {
       </div>
 
       {/* Monster Table */}
-      <div className={`overflow-x-auto rounded-md border ${tableBorderClasses}`}>
-        <Table>
-          <TableHeader>
-            <TableRow className={tableHeaderClasses}>
-              <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>CR</TableHead>
-              <TableHead>AC</TableHead>
-              <TableHead>HP</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((monster) => (
-              <TableRow key={monster.id} className={tableRowClasses}>
-                <TableCell>
-                  {monster.url ? (
-                    <a
-                      href={monster.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={tableCellLinkClasses}
-                    >
-                      {monster.name}
-                    </a>
-                  ) : (
-                    <span className={tableCellTextClasses}>{monster.name}</span>
-                  )}
-                </TableCell>
-                <TableCell className={tableCellTextClasses}>{monster.type}</TableCell>
-                <TableCell className={tableCellTextClasses}>{monster.cr}</TableCell>
-                <TableCell className={tableCellTextClasses}>{monster.ac}</TableCell>
-                <TableCell className={tableCellTextClasses}>{monster.hp}</TableCell>
+      <div className={`overflow-hidden rounded-md border ${tableBorderClasses}`}>
+        <div className="max-h-[70vh] overflow-y-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className={tableHeaderClasses}>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>CR</TableHead>
+                <TableHead>AC</TableHead>
+                <TableHead>HP</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((monster) => (
+                <TableRow key={monster.id} className={tableRowClasses}>
+                  <TableCell>
+                    {monster.url ? (
+                      <a
+                        href={monster.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={tableCellLinkClasses}
+                      >
+                        {monster.name}
+                      </a>
+                    ) : (
+                      <span className={tableCellTextClasses}>{monster.name}</span>
+                    )}
+                  </TableCell>
+                  <TableCell className={tableCellTextClasses}>{monster.type}</TableCell>
+                  <TableCell className={tableCellTextClasses}>{monster.cr}</TableCell>
+                  <TableCell className={tableCellTextClasses}>{monster.ac}</TableCell>
+                  <TableCell className={tableCellTextClasses}>{monster.hp}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

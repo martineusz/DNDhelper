@@ -33,7 +33,7 @@ export default function Login({setIsLoggedIn}) {
                     <div className="flex justify-center mb-4">
                         <img src={dndLogo} alt="DNDHelper Logo" className="h-20 w-20"/>
                     </div>
-                    <CardTitle className="text-4xl font-extrabold text-green-800">DNDHelper</CardTitle>
+                    <CardTitle className="text-4xl font-extrabold text-green-800">D&D Encounter Helper</CardTitle>
                     <CardDescription className="text-green-600">
                         Enter your username and password to access your account.
                     </CardDescription>
