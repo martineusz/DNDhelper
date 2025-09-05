@@ -35,7 +35,7 @@ export default function Dashboard() {
                 <div className="flex items-center space-x-2">
                     <img src={dndLogo} alt="DnDHelper Logo" className="h-8 w-8"/>
                     <span className="text-xl font-bold text-gray-800 dark:text-gray-100">
-            DnDHelper
+            D&D Encounter Helper
           </span>
                 </div>
 
@@ -151,7 +151,7 @@ export default function Dashboard() {
             </header>
 
             {/* MAIN CONTENT */}
-            <div className="flex-grow p-6 overflow-auto">
+            <div className="flex-grow p-6">
                 <main className="mx-auto max-w-7xl">
                     <Outlet/>
                 </main>

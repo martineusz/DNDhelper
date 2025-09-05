@@ -22,12 +22,12 @@ function PlayerCard({ player, onCardClick, darkMode }) {
   const displayValue = (val) => (val == null || val === "" ? "-" : val);
 
   const cardClasses = darkMode
-    ? "bg-gray-800 border-gray-700 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md"
+    ? "bg-gray-800 border border-green-700 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md"
     : "bg-green-50 border border-green-200 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md";
 
-  const titleClasses = darkMode ? "text-gray-100" : "text-green-700";
+  const titleClasses = darkMode ? "text-green-300" : "text-green-700";
   const descriptionClasses = darkMode ? "text-gray-400" : "text-gray-500";
-  const labelClasses = darkMode ? "text-gray-200 font-semibold" : "text-green-600 font-semibold";
+  const labelClasses = darkMode ? "text-green-500 font-semibold" : "text-green-600 font-semibold";
 
   return (
     <Card onClick={() => onCardClick(player)} className={cardClasses}>
@@ -66,7 +66,7 @@ function PlayerCard({ player, onCardClick, darkMode }) {
 
 // New component for the "add" button
 function AddPlayerCard({ onCardClick, darkMode }) {
-  const bgClass = darkMode ? "bg-gray-800 border-gray-600 text-gray-100" : "bg-green-50 border-green-300 text-green-500";
+  const bgClass = darkMode ? "bg-gray-800 border-green-600 text-green-500" : "bg-green-50 border-green-300 text-green-500";
 
   return (
     <div
@@ -96,18 +96,45 @@ function CharacterDetailModal({ player, onClose, onSave, darkMode }) {
   };
 
   const bgClass = darkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-green-200 text-gray-900";
-  const labelClass = darkMode ? "text-gray-200 font-medium" : "text-green-700 font-medium";
-  const inputClass = darkMode ? "bg-gray-800 border-gray-600 text-gray-100 focus:ring-gray-500 focus:border-gray-500" : "bg-green-50 border-green-200 focus:ring-green-300 focus:border-green-300";
+  const labelClass = darkMode ? "text-green-300 font-medium" : "text-green-700 font-medium";
+  const inputClass = darkMode ? "bg-gray-800 border-gray-600 text-gray-100 focus:ring-green-500 focus:border-green-500" : "bg-green-50 border-green-200 focus:ring-green-300 focus:border-green-300";
+
+  // Use a custom style object for the scrollbar
+  const scrollbarStyle = darkMode
+    ? {
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgb(34, 197, 94) rgb(55, 65, 81)',
+      }
+    : {
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgb(21, 128, 61) rgb(240, 253, 244)',
+      };
+
+  const webkitScrollbarClasses = `
+    [&::-webkit-scrollbar]:w-2
+    [&::-webkit-scrollbar-track]:bg-transparent
+    [&::-webkit-scrollbar-thumb]:bg-green-500
+    [&::-webkit-scrollbar-thumb]:rounded-full
+    [&::-webkit-scrollbar-thumb]:border-2
+    [&::-webkit-scrollbar-thumb]:border-transparent
+  `;
+  const webkitDarkScrollbarClasses = `
+    [&::-webkit-scrollbar-thumb]:bg-green-700
+    [&::-webkit-scrollbar-thumb]:border-green-900
+  `;
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className={`sm:max-w-[500px] p-6 rounded-lg shadow-xl border ${bgClass}`}>
+      <DialogContent className={`sm:max-w-[600px] p-6 rounded-lg shadow-xl border ${bgClass}`}>
         <DialogHeader>
           <DialogTitle className={labelClass}>
             {player && player.id ? `Edit ${player.character_name}` : "Create New Character"}
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+        <div
+          className={`grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2 ${webkitScrollbarClasses} ${darkMode ? webkitDarkScrollbarClasses : ''}`}
+          style={scrollbarStyle}
+        >
           {[
             { label: "Character's name", name: "character_name", type: "text" },
             { label: "Player", name: "player_name", type: "text" },
@@ -146,7 +173,7 @@ function CharacterDetailModal({ player, onClose, onSave, darkMode }) {
         <Button
           onClick={handleSaveClick}
           disabled={isSaving}
-          className={`w-full ${darkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-100" : "bg-green-700 hover:bg-green-600 text-white"}`}
+          className={`w-full ${darkMode ? "bg-green-700 hover:bg-green-600 text-white" : "bg-green-700 hover:bg-green-600 text-white"}`}
         >
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
@@ -205,7 +232,7 @@ export default function Players() {
 
   return (
     <div className={`p-6 h-screen overflow-y-auto ${darkMode ? "bg-gray-900" : "bg-white"}`}>
-      <h1 className={`text-2xl font-semibold mb-2 ${darkMode ? "text-gray-100" : "text-green-700"}`}>Player Roster</h1>
+      <h1 className={`text-2xl font-semibold mb-2 ${darkMode ? "text-green-300" : "text-green-700"}`}>Player Roster</h1>
       <p className={`mb-6 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
         Click on a character card to view and edit their details, or add a new one.
       </p>

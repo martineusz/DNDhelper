@@ -1,6 +1,6 @@
 {
-  "short_name": "DNDHelper",
-  "name": "Dungeons and Dragons Helper",
+  "short_name": "DNDEncounterHelper",
+  "name": "Dungeons and Dragons Encounter Helper",
   "icons": [
     {
       "src": "favicon.ico",
