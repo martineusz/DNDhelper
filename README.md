@@ -102,14 +102,6 @@ docker-compose -f docker-compose.prod.yml down
 
 ---
 
-## 📌 Roadmap
-
-- [ ] User authentication (login/logout)
-- [ ] Custom monster creation
-- [ ] Export encounters as JSON
-- [ ] Initiative auto-roller
-
----
 
 ## 🤝 Contributing
 
