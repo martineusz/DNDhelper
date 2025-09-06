@@ -1,4 +1,4 @@
-# 🐉 D&D Encounter Tracker
+# D&D Encounter Tracker
 
 A web application to manage and track **Dungeons & Dragons encounters**.  
 With this tool, you can:
@@ -11,7 +11,7 @@ Built with a **Django + PostgreSQL backend** and a **React frontend**, all conta
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 .
@@ -31,7 +31,7 @@ Built with a **Django + PostgreSQL backend** and a **React frontend**, all conta
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 ```bash
@@ -83,7 +83,7 @@ This will start three services:
 
 ---
 
-## ⚙️ Useful Commands
+##  Useful Commands
 
 Rebuild containers after changes:
 ```bash
@@ -103,20 +103,20 @@ docker-compose -f docker-compose.prod.yml down
 ---
 
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome!  
 Please open an issue or submit a pull request.
 
 ---
 
-## 🎨 Credits
+## Credits
 
 - UI icons are from [svgrepo.com](https://www.svgrepo.com/)  
 - Dungeons and Dragons icon by [Icons8](https://icons8.com/)  
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License.
