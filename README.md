@@ -118,6 +118,13 @@ Please open an issue or submit a pull request.
 
 ---
 
+## 🎨 Credits
+
+- UI icons are from [svgrepo.com](https://www.svgrepo.com/)  
+- Dungeons and Dragons icon by [Icons8](https://icons8.com/)  
+
+---
+
 ## 📜 License
 
 This project is licensed under the MIT License.
