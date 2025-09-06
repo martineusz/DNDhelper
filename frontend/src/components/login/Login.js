@@ -74,7 +74,7 @@ export default function Login({setIsLoggedIn}) {
                         <Link to="/register" className="w-full">
                             <Button type="button" variant="outline"
                                     className="w-full bg-green-100 text-green-700 hover:bg-green-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                                Register
+                                Don't have an account? Sign in!
                             </Button>
                         </Link>
                         <Link to="/forgot-password" className="w-full text-center">
